@@ -106,16 +106,16 @@ const SkillGapSection = () => {
               <BarChart3 className="w-5 h-5 text-accent" />
               <span className="text-accent text-sm font-medium uppercase tracking-wider">Skill Gap Analyzer</span>
             </div>
-            
+
             <h2 className="text-4xl lg:text-5xl font-bold mb-6">
               <span className="gradient-text">Know Your Gaps.</span>
               <br />
               <span className="text-foreground">Close Them Fast.</span>
             </h2>
-            
+
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              Our AI-powered analyzer compares your current skills against industry demands. 
-              Get personalized insights on exactly what you need to learn to become job-ready 
+              Our AI-powered analyzer compares your current skills against industry demands.
+              Get personalized insights on exactly what you need to learn to become job-ready
               in your chosen field.
             </p>
 
@@ -138,11 +138,12 @@ const SkillGapSection = () => {
                 </motion.div>
               ))}
             </div>
-
-            <GradientButton>
-              Analyze My Skills
-              <ArrowRight className="w-5 h-5" />
-            </GradientButton>
+            <Link href="/skillgapanalyzer">
+              <GradientButton>
+                Analyze My Skills
+                <ArrowRight className="w-5 h-5" />
+              </GradientButton>
+            </Link>
           </motion.div>
         </div>
       </div>

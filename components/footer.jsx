@@ -16,10 +16,10 @@ export const Footer = () => {
           </div>
 
           <div className="flex items-center gap-6 text-sm text-white/50">
-            <a href="#" className="hover:text-white transition-colors">Home</a>
-            <a href="#" className="hover:text-white transition-colors">About</a>
-            <a href="#" className="hover:text-white transition-colors">Contact Us</a>
-            <a href="#" className="hover:text-white transition-colors">FAQs</a>
+            <a href="/" className="hover:text-white transition-colors">Home</a>
+            <a href="/about" className="hover:text-white transition-colors">About</a>
+            <a href="/contact" className="hover:text-white transition-colors">Contact Us</a>
+            <a href="/faqs" className="hover:text-white transition-colors">FAQs</a>
           </div>
 
           <p className="text-white/40 text-sm">

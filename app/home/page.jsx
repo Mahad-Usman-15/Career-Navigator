@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-
+import Link from "next/link";
 // Reusable Button Component
 function Button({ children, variant = "primary", className = "", ...props }) {
   const baseStyles =
@@ -136,12 +136,16 @@ function HeroSection() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button variant="primary" className="w-full sm:w-auto text-base px-8 py-4">
-            Discover Your Path
-          </Button>
-          <Button variant="secondary" className="w-full sm:w-auto text-base px-8 py-4">
-            Watch Demo
-          </Button>
+          <Link href="/careercounselling">
+            <Button variant="primary" className="w-full sm:w-auto text-base px-8 py-4">
+              Discover Your Path
+            </Button>
+          </Link>
+          <Link href="/careercounselling">
+            <Button variant="secondary" className="w-full sm:w-auto text-base px-8 py-4">
+              Watch Demo
+            </Button>
+          </Link>
         </div>
 
         {/* Scroll Indicator */}
@@ -196,10 +200,11 @@ function CareerGuidanceSection() {
                 </li>
               ))}
             </ul>
-
-            <Button variant="primary">
-              Find Your Mentor
-            </Button>
+            <Link href={"/careercounselling"}>
+              <Button variant="primary">
+                Find Your Mentor
+              </Button>
+            </Link>
           </div>
 
           {/* Right Column - Video */}
@@ -257,10 +262,11 @@ function SkillGapSection() {
                 </div>
               ))}
             </div>
-
-            <Button variant="primary">
-              Analyze My Skills
-            </Button>
+            <Link href={"/skillgapanalyzer"}>
+              <Button variant="primary">
+                Analyze My Skills
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
@@ -360,13 +366,13 @@ function FinalBannerSection() {
 export default function CareerNavigatorPage() {
   return (
     <main className="min-h-screen bg-[#171717]">
-      
+
       <HeroSection />
       <CareerGuidanceSection />
       <SkillGapSection />
       <ImpactSection />
       <FinalBannerSection />
-      
+
     </main>
   );
 }

@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Play, Users, Target, Compass } from "lucide-react";
 import { GradientButton } from "./gradientbutton";
-
+import Link from "next/link";
 const CareerGuidanceSection = () => {
   return (
     <section className="relative py-24 px-6 overflow-hidden">
@@ -22,16 +22,16 @@ const CareerGuidanceSection = () => {
               <Compass className="w-5 h-5 text-accent" />
               <span className="text-accent text-sm font-medium uppercase tracking-wider">Career Guidance</span>
             </div>
-            
+
             <h2 className="text-4xl lg:text-5xl font-bold mb-6">
               <span className="gradient-text">Expert Mentorship</span>
               <br />
               <span className="text-foreground">For Every Step</span>
             </h2>
-            
+
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              Get personalized guidance from industry professionals who've walked your path. 
-              Our mentors help you see beyond the surface, understand real-world expectations, 
+              Get personalized guidance from industry professionals who've walked your path.
+              Our mentors help you see beyond the surface, understand real-world expectations,
               and make informed decisions about your future.
             </p>
 
@@ -56,11 +56,12 @@ const CareerGuidanceSection = () => {
                 </motion.div>
               ))}
             </div>
-
+            <Link href="/careercounselling">
             <GradientButton>
               Get Career Guidance
               <ArrowRight className="w-5 h-5" />
             </GradientButton>
+            </Link>
           </motion.div>
 
           {/* Right Content - Video Section */}
@@ -82,7 +83,7 @@ const CareerGuidanceSection = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Video description overlay */}
                 <div className="absolute bottom-4 left-4 right-4">
                   <div className="glass rounded-lg px-4 py-3">
