@@ -6,7 +6,6 @@ import { generateSkillGapAnalysis } from '../../../lib/ai-agent'; // We'll defin
 export async function POST(req) {
   try {
     await dbConnect();
-
     // 1. Extract data from request (sent from your Frontend)
     const { clerkId, name, resumeText, jobDescription, resumeSource, clerkData } = await req.json();
 

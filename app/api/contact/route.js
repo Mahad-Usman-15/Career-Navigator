@@ -16,15 +16,13 @@ export async function POST(request) {
 
     // Use Resend React email rendering directly
     const { data, error } = await resend.emails.send({
-      from: 'Your Company <onboarding@yourdomain.com>',
-      to: ['mahadusman2008@gmail.com'],
+      to: "mahadusman2008@gmail.com",  // Your email
+      from: "onboarding@resend.dev",
       subject: 'New Contact Form Submission',
-      react: EmailTemplate({
-        name,
-        email,
-        contactNumber,
-        reason,
-      }), // Pass JSX, NOT HTML
+      html: `<p><strong>Name:</strong> ${name}</p>
+    <p><strong>Email:</strong> ${email}</p>
+    <p><strong>Contact Number:</strong> ${contactNumber}</p>
+    <p><strong>Reason:</strong> ${reason}</p>`
     });
 
     if (error) {
