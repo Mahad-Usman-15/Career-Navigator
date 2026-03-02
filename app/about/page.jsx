@@ -280,24 +280,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-white/10">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="text-xl font-bold bg-linear-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-              Career Navigator
-            </div>
-            <div className="flex items-center gap-6 text-white/60 text-sm">
-              <a href="#" className="hover:text-white transition-colors">Privacy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms</a>
-              <a href="#" className="hover:text-white transition-colors">Contact</a>
-            </div>
-            <p className="text-white/40 text-sm">
-              © 2026 Career Navigator. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+  
     </main>
   );
 }

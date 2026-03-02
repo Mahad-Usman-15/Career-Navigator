@@ -134,7 +134,6 @@ export default function FAQPage() {
       <HeroSection />
       <FAQSection />
       <CTASection />
-      <Footer />
     </main>
   )
 }

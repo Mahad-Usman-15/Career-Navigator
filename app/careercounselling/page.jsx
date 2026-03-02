@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { X, ChevronRight, ChevronLeft, User, Brain, Lightbulb, Target, Sparkles, CheckCircle2 } from "lucide-react"
 
 // MBTI Questions Data
@@ -82,7 +82,7 @@ export default function CareerCounsellor() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const [isCompleted, setIsCompleted] = useState(false)
-  
+
   // Form data
   const [personalInfo, setPersonalInfo] = useState({ name: "", age: "", qualifications: [] })
   const [mbtiAnswers, setMbtiAnswers] = useState({})
@@ -92,14 +92,51 @@ export default function CareerCounsellor() {
   const [aspirations, setAspirations] = useState("")
   const [randomIqQuestions, setRandomIqQuestions] = useState([])
 
-  const qualificationOptions = ["School", "College", "Undergraduate"]
+  const qualificationOptions = ['School', 'College', 'Under Graduate']
+  const submitAssessmentData = async () => {
+    try {
+      // Prepare data for submission
+      const assessmentData = {
+        name: personalInfo.name,
+        age: parseInt(personalInfo.age),
+        current_qualification: personalInfo.qualifications[0], // Taking first qualification
+        email: "", // Add email field if you have it
+        mbtiAnswers: mbtiAnswers,
+        iqAnswers: iqAnswers,
+        skills: skills,
+        strengths: strengths,
+        aspirations: aspirations
+      };
+
+      const response = await fetch('/api/assessments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(assessmentData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        console.log('Assessment saved successfully:', result);
+        return result;
+      } else {
+        console.error('Failed to save assessment:', result.error);
+        throw new Error(result.error || 'Failed to save assessment');
+      }
+    } catch (error) {
+      console.error('Error submitting assessment:', error);
+      throw error;
+    }
+  };
 
   // Function to shuffle array using Fisher-Yates algorithm
   const shuffleArray = (array) => {
     const shuffled = [...array]
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1))
-      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
     }
     return shuffled
   }
@@ -158,10 +195,27 @@ export default function CareerCounsellor() {
     }
   }
 
-  const handleComplete = () => {
-    setIsCompleted(true)
-    setIsModalOpen(false)
-  }
+  const handleComplete = async () => {
+    try {
+      const result = await submitAssessmentData();
+
+      // Store assessment ID in localStorage or state for later reference
+      localStorage.setItem('assessmentId', result.data.id);
+
+      setIsCompleted(true);
+      setIsModalOpen(false);
+
+      // Show success message
+      alert('Assessment completed successfully! Your results have been saved.');
+
+      // You can redirect to results page or show results here
+      // router.push(`/results/${result.data.id}`);
+
+    } catch (error) {
+      alert('Failed to save assessment. Please try again.');
+      console.error(error);
+    }
+  };
 
   const openModal = () => {
     setIsModalOpen(true)
@@ -201,7 +255,7 @@ export default function CareerCounsellor() {
 
             {/* Tagline */}
             <p className="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed">
-              Take our comprehensive career assessment combining personality analysis, 
+              Take our comprehensive career assessment combining personality analysis,
               cognitive evaluation, and personal interests to find careers that truly match who you are.
             </p>
 
@@ -270,13 +324,12 @@ export default function CareerCounsellor() {
                     <div key={step.id} className="flex items-center flex-1">
                       <div className="flex flex-col items-center">
                         <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
-                            isComplete
-                              ? "bg-linear-to-r from-green-500 to-emerald-500 text-white"
-                              : isActive
+                          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${isComplete
+                            ? "bg-linear-to-r from-green-500 to-emerald-500 text-white"
+                            : isActive
                               ? "bg-linear-to-r from-blue-500 to-cyan-500 text-white ring-4 ring-blue-500/30"
                               : "bg-white/10 text-white/40"
-                          }`}
+                            }`}
                         >
                           {isComplete ? (
                             <CheckCircle2 className="w-5 h-5" />
@@ -290,9 +343,8 @@ export default function CareerCounsellor() {
                       </div>
                       {index < steps.length - 1 && (
                         <div
-                          className={`flex-1 h-0.5 mx-2 transition-colors duration-300 ${
-                            isComplete ? "bg-linear-to-r from-green-500 to-emerald-500" : "bg-white/10"
-                          }`}
+                          className={`flex-1 h-0.5 mx-2 transition-colors duration-300 ${isComplete ? "bg-linear-to-r from-green-500 to-emerald-500" : "bg-white/10"
+                            }`}
                         />
                       )}
                     </div>
@@ -311,7 +363,7 @@ export default function CareerCounsellor() {
                       Personal Information
                     </h3>
                     <p className="text-white/60">
-                      We need some basic information to personalize your career recommendations. 
+                      We need some basic information to personalize your career recommendations.
                       Your data helps us understand your educational background and life stage.
                     </p>
                   </div>
@@ -349,11 +401,10 @@ export default function CareerCounsellor() {
                         {qualificationOptions.map((qual) => (
                           <label
                             key={qual}
-                            className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
-                              personalInfo.qualifications.includes(qual)
-                                ? "bg-cyan-500/10 border-cyan-500/50"
-                                : "bg-white/5 border-white/10 hover:bg-white/10"
-                            }`}
+                            className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${personalInfo.qualifications.includes(qual)
+                              ? "bg-cyan-500/10 border-cyan-500/50"
+                              : "bg-white/5 border-white/10 hover:bg-white/10"
+                              }`}
                           >
                             <input
                               type="checkbox"
@@ -378,7 +429,7 @@ export default function CareerCounsellor() {
                       Personality Type Assessment
                     </h3>
                     <p className="text-white/60">
-                      Answer all 20 questions honestly based on your natural preferences. 
+                      Answer all 20 questions honestly based on your natural preferences.
                       There are no right or wrong answers.
                     </p>
                     <div className="mt-3 p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
@@ -400,11 +451,10 @@ export default function CareerCounsellor() {
                           {q.options.map((option, optIdx) => (
                             <label
                               key={optIdx}
-                              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${
-                                mbtiAnswers[q.id] === optIdx
-                                  ? "bg-cyan-500/20 border border-cyan-500/50"
-                                  : "bg-white/5 hover:bg-white/10"
-                              }`}
+                              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${mbtiAnswers[q.id] === optIdx
+                                ? "bg-cyan-500/20 border border-cyan-500/50"
+                                : "bg-white/5 hover:bg-white/10"
+                                }`}
                             >
                               <input
                                 type="radio"
@@ -433,11 +483,10 @@ export default function CareerCounsellor() {
                           {q.options.map((option, optIdx) => (
                             <label
                               key={optIdx}
-                              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${
-                                mbtiAnswers[q.id] === optIdx
-                                  ? "bg-cyan-500/20 border border-cyan-500/50"
-                                  : "bg-white/5 hover:bg-white/10"
-                              }`}
+                              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${mbtiAnswers[q.id] === optIdx
+                                ? "bg-cyan-500/20 border border-cyan-500/50"
+                                : "bg-white/5 hover:bg-white/10"
+                                }`}
                             >
                               <input
                                 type="radio"
@@ -466,11 +515,10 @@ export default function CareerCounsellor() {
                           {q.options.map((option, optIdx) => (
                             <label
                               key={optIdx}
-                              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${
-                                mbtiAnswers[q.id] === optIdx
-                                  ? "bg-cyan-500/20 border border-cyan-500/50"
-                                  : "bg-white/5 hover:bg-white/10"
-                              }`}
+                              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${mbtiAnswers[q.id] === optIdx
+                                ? "bg-cyan-500/20 border border-cyan-500/50"
+                                : "bg-white/5 hover:bg-white/10"
+                                }`}
                             >
                               <input
                                 type="radio"
@@ -499,11 +547,10 @@ export default function CareerCounsellor() {
                           {q.options.map((option, optIdx) => (
                             <label
                               key={optIdx}
-                              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${
-                                mbtiAnswers[q.id] === optIdx
-                                  ? "bg-cyan-500/20 border border-cyan-500/50"
-                                  : "bg-white/5 hover:bg-white/10"
-                              }`}
+                              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${mbtiAnswers[q.id] === optIdx
+                                ? "bg-cyan-500/20 border border-cyan-500/50"
+                                : "bg-white/5 hover:bg-white/10"
+                                }`}
                             >
                               <input
                                 type="radio"
@@ -548,11 +595,10 @@ export default function CareerCounsellor() {
                           {q.options.map((option, optIdx) => (
                             <label
                               key={optIdx}
-                              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${
-                                iqAnswers[q.id] === option
-                                  ? "bg-cyan-500/20 border border-cyan-500/50"
-                                  : "bg-white/5 hover:bg-white/10"
-                              }`}
+                              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${iqAnswers[q.id] === option
+                                ? "bg-cyan-500/20 border border-cyan-500/50"
+                                : "bg-white/5 hover:bg-white/10"
+                                }`}
                             >
                               <input
                                 type="radio"
@@ -586,7 +632,7 @@ export default function CareerCounsellor() {
 
                   <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
                     <p className="text-blue-400 text-sm">
-                      <strong>Examples:</strong> Programming, public speaking, creative writing, data analysis, 
+                      <strong>Examples:</strong> Programming, public speaking, creative writing, data analysis,
                       leadership, problem-solving, art & design, music, sports, teaching, research, etc.
                     </p>
                   </div>
@@ -617,14 +663,14 @@ export default function CareerCounsellor() {
                       Strengths & Weaknesses
                     </h3>
                     <p className="text-white/60">
-                      Honest self-assessment is key to finding the right career. What are your greatest strengths? 
+                      Honest self-assessment is key to finding the right career. What are your greatest strengths?
                       What areas do you want to improve?
                     </p>
                   </div>
 
                   <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
                     <p className="text-amber-400 text-sm">
-                      <strong>Tip:</strong> Think about feedback you've received from teachers, mentors, or colleagues. 
+                      <strong>Tip:</strong> Think about feedback you've received from teachers, mentors, or colleagues.
                       Consider both professional and personal qualities.
                     </p>
                   </div>
@@ -655,14 +701,14 @@ export default function CareerCounsellor() {
                       Future Aspirations
                     </h3>
                     <p className="text-white/60">
-                      Dream big! What do you want to achieve in your career and life? 
+                      Dream big! What do you want to achieve in your career and life?
                       Where do you see yourself in 5, 10, or 20 years?
                     </p>
                   </div>
 
                   <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20">
                     <p className="text-green-400 text-sm">
-                      <strong>Remember:</strong> Your aspirations shape your journey. Think about the impact you want 
+                      <strong>Remember:</strong> Your aspirations shape your journey. Think about the impact you want
                       to make, the lifestyle you desire, and the legacy you want to leave.
                     </p>
                   </div>
