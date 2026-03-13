@@ -287,16 +287,7 @@ We are looking for a Senior Frontend Developer with 5+ years of experience in Re
         </p>
       </section>
 
-      {/* Footer */}
-      <footer
-        className="px-6 py-8 text-center border-t"
-        style={{ borderColor: "#333333" }}
-      >
-        <p className="text-white/40 text-sm">
-          Career Navigator &copy; {new Date().getFullYear()} — Your path to
-          career success
-        </p>
-      </footer>
+
     </main>
   );
 }
