@@ -65,6 +65,9 @@ const Navbar = () => {
                 </SignUpButton>
               </SignedOut>
               <SignedIn>
+                <a href="/dashboard">
+                  <GradientButton size="sm">Dashboard</GradientButton>
+                </a>
                 <UserButton afterSignOutUrl="/" />
               </SignedIn>
             </div>
@@ -109,6 +112,9 @@ const Navbar = () => {
                     </SignUpButton>
                   </SignedOut>
                   <SignedIn>
+                    <a href="/dashboard" onClick={() => setIsOpen(false)}>
+                      <GradientButton size="sm" className="w-full">Dashboard</GradientButton>
+                    </a>
                     <UserButton afterSignOutUrl="/" />
                   </SignedIn>
                 </div>

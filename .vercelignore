@@ -1,0 +1,27 @@
+# Documentation & design artifacts
+project_prd.md
+prototype.png
+prototype2.png
+apiroutes.txt
+CLAUDE.md
+README.md
+main.py
+
+# Spec / planning artifacts
+specs/
+history/
+.specify/
+.agents/
+.claude/
+
+# Test files
+__tests__/
+vitest.config.ts
+
+# Scripts
+scripts/
+
+# Local dev
+.env.local
+.env*.local
+skills-lock.json

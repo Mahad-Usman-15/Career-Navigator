@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model career_assessments {
+  id            String   @id @default(cuid())
+  clerkId       String   @unique
+  name          String
+  email         String?
+  age           Int
+  qualification String
+  personality   Json
+  iq            Json
+  skills        Json
+  isComplete    Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  career_guidance career_guidance[]
+
+  @@index([clerkId])
+}
+
+model career_guidance {
+  id                 String             @id @default(cuid())
+  clerkId            String
+  assessmentId       String
+  assessment         career_assessments @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  assessmentSnapshot Json
+  recommendations    Json
+  overallTimeline    Json
+  generatedAt        DateTime           @default(now())
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@index([clerkId])
+}
+
+model skill_gaps {
+  id             String   @id @default(cuid())
+  clerkId        String
+  resumeSource   String
+  resumeContent  String
+  jobDescription String
+  analysis       Json
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([clerkId])
+  @@index([clerkId, createdAt(sort: Desc)])
+}
+
+model users {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  name      String   @default("")
+  email     String   @default("")
+  createdAt DateTime @default(now())
+
+  @@index([clerkId])
+}

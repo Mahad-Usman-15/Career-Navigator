@@ -82,6 +82,9 @@ export default function CareerCounsellor() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const [isCompleted, setIsCompleted] = useState(false)
+  // guidanceStep: 'idle' | 'generating' | 'done' | 'error'
+  const [guidanceStep, setGuidanceStep] = useState('idle')
+  const [careerPaths, setCareerPaths] = useState([])
 
   // Form data
   const [personalInfo, setPersonalInfo] = useState({ name: "", age: "", qualifications: [] })
@@ -108,7 +111,7 @@ export default function CareerCounsellor() {
         aspirations: aspirations
       };
 
-      const response = await fetch('/api/assessments', {
+      const response = await fetch('/api/career-assessment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -199,17 +202,25 @@ export default function CareerCounsellor() {
     try {
       const result = await submitAssessmentData();
 
-      // Store assessment ID in localStorage or state for later reference
       localStorage.setItem('assessmentId', result.data.id);
 
       setIsCompleted(true);
       setIsModalOpen(false);
 
-      // Show success message
-      alert('Assessment completed successfully! Your results have been saved.');
-
-      // You can redirect to results page or show results here
-      // router.push(`/results/${result.data.id}`);
+      // FR-001: automatically trigger guidance generation after assessment save
+      setGuidanceStep('generating');
+      try {
+        const guidanceResponse = await fetch('/api/generateguidance', { method: 'POST' });
+        const data = await guidanceResponse.json();
+        if (guidanceResponse.ok && data.data?.recommendations) {
+          setCareerPaths(data.data.recommendations.slice(0, 3));
+          setGuidanceStep('done');
+        } else {
+          setGuidanceStep('error');
+        }
+      } catch {
+        setGuidanceStep('error');
+      }
 
     } catch (error) {
       alert('Failed to save assessment. Please try again.');
@@ -294,6 +305,56 @@ export default function CareerCounsellor() {
           </div>
         </div>
       </section>
+
+      {/* Guidance Generation Section — shown after assessment completion */}
+      {guidanceStep === 'generating' && (
+        <section className="max-w-3xl mx-auto px-4 pb-16 text-center">
+          <div className="p-8 rounded-2xl bg-white/5 border border-white/10">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-10 h-10 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+              <p className="text-white/80 text-lg">Generating your career paths…</p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {guidanceStep === 'done' && careerPaths.length > 0 && (
+        <section className="max-w-3xl mx-auto px-4 pb-16">
+          <h2 className="text-2xl font-bold text-center mb-6"
+            style={{ background: 'linear-gradient(135deg, #1e3a8a, #60a5fa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            Your Career Paths
+          </h2>
+          <div className="space-y-4">
+            {careerPaths.map((path, i) => (
+              <div key={i} className="p-6 rounded-2xl bg-white/5 border border-white/10">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-white font-semibold text-lg">{path.title}</h3>
+                  <span className="text-cyan-400 font-bold">{path.matchScore}% match</span>
+                </div>
+                <p className="text-white/60 text-sm">{path.reasoning}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-6">
+            <a href="/dashboard" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-medium hover:scale-105 transition-transform">
+              View Full Results on Dashboard
+              <ChevronRight className="w-4 h-4" />
+            </a>
+          </div>
+        </section>
+      )}
+
+      {guidanceStep === 'error' && (
+        <section className="max-w-3xl mx-auto px-4 pb-16 text-center">
+          <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
+            <p className="text-white/60 mb-4">Career guidance temporarily unavailable — view your assessment on the Dashboard</p>
+            <a href="/dashboard" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/10 text-white font-medium hover:bg-white/20 transition-colors">
+              View Assessment on Dashboard
+              <ChevronRight className="w-4 h-4" />
+            </a>
+          </div>
+        </section>
+      )}
 
       {/* Test Modal */}
       {isModalOpen && (

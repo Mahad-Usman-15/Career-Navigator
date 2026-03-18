@@ -1,0 +1,60 @@
+Note:once the data is injested use fetch api for fetching the questions.All client side work should be done under /lib 
+/api/contact post for creating a contact.
+/api/mbtiquestions/ ->create a GET method .
+inject data into the database with a script/ingest.js
+
+/api/iqquestions ->ingest all iq questions to db with script/ingest.js
+
+/api/careerassessment 
+get user personal info
+get user answers for iq questions
+get user skills and interests
+get user aspirations
+post methods for creating data	 
+
+
+This data will be used by a mcp server tool to analyze it and generate complete roadmap:Analyzes aggregated user data using AI to suggest 3-5 relevant career paths (e.g., Software Engineer, Data Analyst for a CS student with programming interest).
+Generates detailed roadmaps for each path, including education steps, certifications, internships, and timelines.
+ 
+
+/api/skillgapanalyzer
+store user jd and resume.
+User uploads PDF
+        │
+        ▼
+  API Route receives PDF as multipart/form-data
+        │
+        ▼
+  pdf-parse extracts plain text from PDF buffer
+        │
+        ▼
+  Extracted text → passed to Gemini for analysis
+        │
+        ▼
+  DB stores: resumeContent (text string) + resumeSource: "pdf"
+             NOT the PDF binary
+
+/api/generateguidance
+this api is for agents response
+
+/api/jobs ->This feature is for future.
+
+
+
+
+
+Analyze the complete project and check what is still needed to be implemented because I tested my self and found these issues:
+DASHBOARD UI IS NOT ACORDING TO THE THEME OF THE WEBSITE.
+OPENAI AGENTS IS NOT USED TO CREATE CAREERGUIDANCE AGENT AND SKILLSANALYZER AGENT.
+THE APIS ARE NOT USED BY THE CLIENT COMPONENTS.
+CAREER GUIDANCE AND SKILLS GAP ANALYZER ARE NOT WORKING.
+(no implementation for now)
+
+
+
+/sp.specify
+
+
+
+
+

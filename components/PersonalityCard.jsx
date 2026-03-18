@@ -11,6 +11,7 @@ const PersonalityCard = ({
 }) => {
   return (
     <article
+      id={code}
       className={cn(
         "personality-card card-glow animate-fade-up"
       )}

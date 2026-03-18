@@ -3,6 +3,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Navbar from "@/components/navbar";
 import  { Footer } from "@/components/footer";
+import { Analytics } from "@vercel/analytics/next";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -28,6 +29,7 @@ export default function RootLayout({ children }) {
           {children}
           <Footer/>
         </ClerkProvider>
+        <Analytics />
       </body>
     </html>
   );
