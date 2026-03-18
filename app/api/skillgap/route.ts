@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth-guard'
 import { prisma } from '@/lib/db'
-import { PDFParse } from 'pdf-parse'
+import pdfParse from 'pdf-parse'
 import { analyzeSkillGap } from '@/lib/agents/SkillAnalyzerAgent'
 import { sanitizeInput } from '@/lib/sanitize'
 
@@ -29,8 +29,7 @@ export async function POST(req: NextRequest) {
     if (resumeFile && resumeFile.size > 0) {
       // PDF path — Constitution Principle IV: extract text, never store binary
       const buffer = Buffer.from(await resumeFile.arrayBuffer())
-      const parser = new PDFParse({ data: buffer })
-      const parsed = await parser.getText()
+      const parsed = await pdfParse(buffer)
       extractedText = parsed.text.trim()
       resumeSource = 'pdf'
 
