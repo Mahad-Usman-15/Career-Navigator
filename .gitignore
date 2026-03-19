@@ -44,3 +44,21 @@ next-env.d.ts
 /.clerk/
 
 .vercel
+
+# duplicate @/ alias folder (resolved by tsconfig @/* -> ./*)
+/@/
+
+# dev/non-production files
+/.agents/
+/.specify/
+/.claude/
+/.mcp.json
+/history/
+/specs/
+/project_prd.md
+/prototype*.png
+/apiroutes.txt
+/skills-lock.json
+/scripts/
+*.pdf
+CLAUDE.md

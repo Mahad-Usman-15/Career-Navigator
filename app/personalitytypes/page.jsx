@@ -1,5 +1,5 @@
 import PersonalityCard from "@/components/PersonalityCard";
-import { personalityTypes } from "../../components/data/personalityTypes";
+import { personalityTypes } from "@/components/data/personalityTypes";
 
 // T011: Dark theme — bg-[#171717] page background, gradient headings, text-white/60 secondary text
 const Index = () => {
