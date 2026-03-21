@@ -1,6 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import Swal from "sweetalert2";
+
+const toast = (icon, title) =>
+  Swal.fire({
+    toast: true,
+    position: "top-end",
+    icon,
+    title,
+    showConfirmButton: false,
+    timer: 3500,
+    timerProgressBar: true,
+    background: "#222222",
+    color: "#ffffff",
+    iconColor: icon === "error" ? "#f87171" : icon === "success" ? "#4ade80" : "#60a5fa",
+  });
 
 export default function SkillGapAnalyzerClient() {
   const [inputMethod, setInputMethod] = useState("form");
@@ -18,7 +33,7 @@ export default function SkillGapAnalyzerClient() {
     if (file && file.type === "application/pdf") {
       setResume(file);
     } else {
-      alert("Please upload a PDF file only.");
+      toast("error", "Please upload a PDF file only.");
       e.target.value = "";
     }
   };
@@ -26,18 +41,18 @@ export default function SkillGapAnalyzerClient() {
   const handleAnalyze = async () => {
     if (inputMethod === "form") {
       if (!skills.trim() || !experience.trim() || !currentRole.trim()) {
-        alert("Please fill in all form fields.");
+        toast("warning", "Please fill in all form fields.");
         return;
       }
     } else {
       if (!resume) {
-        alert("Please upload your resume.");
+        toast("warning", "Please upload your resume.");
         return;
       }
     }
 
     if (!jobDescription.trim()) {
-      alert("Please paste a job description.");
+      toast("warning", "Please paste a job description.");
       return;
     }
 
@@ -64,9 +79,12 @@ export default function SkillGapAnalyzerClient() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Analysis failed. Please try again.");
+        const msg = data.error || "Analysis failed. Please try again.";
+        setError(msg);
+        toast("error", msg);
       } else {
         setResult(data.analysis);
+        toast("success", "Skill gap analysis complete!");
       }
     } catch {
       setError("Network error. Please check your connection and try again.");

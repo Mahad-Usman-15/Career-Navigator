@@ -3,6 +3,16 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/db'
 
+export const metadata = {
+  title: "Dashboard — Career Navigator",
+  description:
+    "View your career assessment results, skill gap analysis, and personalised career paths in one place.",
+  robots: { index: false, follow: false },
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+  },
+};
+
 export default async function DashboardPage() {
   const { userId } = await auth()
   if (!userId) redirect('/sign-in')

@@ -2,6 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth-guard'
 import { prisma } from '@/lib/db'
 
+// Input guardrail — detects gibberish before saving to DB
+function isGibberish(text: string): boolean {
+  const t = text.trim().toLowerCase()
+  if (t.length < 5) return true
+  const noSpaces = t.replace(/\s+/g, '')
+  const diversity = new Set(noSpaces).size / noSpaces.length
+  if (diversity < 0.15) return true
+  const vowels = (t.match(/[aeiou]/g) || []).length
+  if (noSpaces.length > 0 && vowels / noSpaces.length < 0.05) return true
+  const realWords = t.split(/\s+/).filter(w => w.length >= 2)
+  if (realWords.length < 2) return true
+  return false
+}
+
 // MBTI calculation — ties resolve to first letter (E, S, T, J) via > operator (intentional default)
 function calculateMBTI(mbtiAnswers: Record<string, number>): {
   type: string
@@ -106,6 +120,43 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(
         { error: 'Missing required fields: name, age, qualification, mbtiAnswers, iqAnswers' },
         { status: 400 }
+      )
+    }
+
+    // Input guardrails — validate free-text fields before DB write
+    const age = parseInt(data.age)
+    if (isNaN(age) || age < 13 || age > 100) {
+      return NextResponse.json(
+        { error: 'Age must be between 13 and 100.' },
+        { status: 422 }
+      )
+    }
+
+    if (!data.name.trim() || data.name.trim().length < 2) {
+      return NextResponse.json(
+        { error: 'Please enter your full name.' },
+        { status: 422 }
+      )
+    }
+
+    if (data.skills && isGibberish(data.skills)) {
+      return NextResponse.json(
+        { error: 'Skills input does not appear to be meaningful. Please describe your actual skills and interests.' },
+        { status: 422 }
+      )
+    }
+
+    if (data.strengths && isGibberish(data.strengths)) {
+      return NextResponse.json(
+        { error: 'Strengths input does not appear to be meaningful. Please describe your actual strengths.' },
+        { status: 422 }
+      )
+    }
+
+    if (data.aspirations && isGibberish(data.aspirations)) {
+      return NextResponse.json(
+        { error: 'Aspirations input does not appear to be meaningful. Please describe your actual goals.' },
+        { status: 422 }
       )
     }
 

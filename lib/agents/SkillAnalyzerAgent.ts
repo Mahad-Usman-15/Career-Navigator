@@ -56,6 +56,15 @@ async function tryGemini(prompt: string): Promise<SkillGapAnalysis> {
   return parsed
 }
 
+// Output guardrail — rejects hollow AI responses that look like hallucinations
+function isHollowResult(result: SkillGapAnalysis): boolean {
+  const hasNoSkills =
+    result.missingSkills.length === 0 && result.matchingSkills.length === 0
+  const suspiciousScore =
+    result.compatibilityScore === 0 || result.compatibilityScore === 100
+  return hasNoSkills && suspiciousScore
+}
+
 export async function analyzeSkillGap(
   resumeContent: string,
   jobDescription: string
@@ -64,21 +73,27 @@ export async function analyzeSkillGap(
 
   // Level 1: Groq llama-3.3-70b-versatile (strongest, primary)
   try {
-    return await tryGroqAgent('llama-3.3-70b-versatile', prompt)
+    const result = await tryGroqAgent('llama-3.3-70b-versatile', prompt)
+    if (isHollowResult(result)) throw new Error('Output guardrail: hollow result from level 1')
+    return result
   } catch (err) {
     console.error('SkillAnalyzerAgent level 1 failed:', err)
   }
 
   // Level 2: Groq llama-3.1-8b-instant (lighter fallback)
   try {
-    return await tryGroqAgent('llama-3.1-8b-instant', prompt)
+    const result = await tryGroqAgent('llama-3.1-8b-instant', prompt)
+    if (isHollowResult(result)) throw new Error('Output guardrail: hollow result from level 2')
+    return result
   } catch (err) {
     console.error('SkillAnalyzerAgent level 2 failed:', err)
   }
 
-  // Level 3: Gemini 1.5 Flash (secondary provider fallback)
+  // Level 3: Gemini 2.0 Flash (secondary provider fallback)
   try {
-    return await tryGemini(prompt)
+    const result = await tryGemini(prompt)
+    if (isHollowResult(result)) throw new Error('Output guardrail: hollow result from level 3')
+    return result
   } catch (err) {
     console.error('SkillAnalyzerAgent level 3 failed:', err)
   }

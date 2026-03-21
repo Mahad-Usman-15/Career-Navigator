@@ -99,6 +99,16 @@ async function tryGemini(prompt: string): Promise<CareerGuidance> {
   return parsed
 }
 
+// Output guardrail — rejects hollow AI responses that look like hallucinations
+function isHollowGuidance(result: CareerGuidance): boolean {
+  if (!result.recommendations || result.recommendations.length === 0) return true
+  const allZeroScores = result.recommendations.every(
+    r => r.matchScore === 0 || r.matchScore === 100
+  )
+  const allEmptyTitles = result.recommendations.every(r => !r.title || r.title.trim().length < 3)
+  return allZeroScores && allEmptyTitles
+}
+
 export async function generateCareerGuidance(
   assessment: AssessmentInput
 ): Promise<CareerGuidance> {
@@ -106,21 +116,27 @@ export async function generateCareerGuidance(
 
   // Level 1: Groq llama-3.3-70b-versatile (strongest, primary)
   try {
-    return await tryGroqAgent('llama-3.3-70b-versatile', prompt)
+    const result = await tryGroqAgent('llama-3.3-70b-versatile', prompt)
+    if (isHollowGuidance(result)) throw new Error('Output guardrail: hollow result from level 1')
+    return result
   } catch (err) {
     console.error('CareerGuidanceAgent level 1 failed:', err)
   }
 
   // Level 2: Groq llama-3.1-8b-instant (lighter fallback)
   try {
-    return await tryGroqAgent('llama-3.1-8b-instant', prompt)
+    const result = await tryGroqAgent('llama-3.1-8b-instant', prompt)
+    if (isHollowGuidance(result)) throw new Error('Output guardrail: hollow result from level 2')
+    return result
   } catch (err) {
     console.error('CareerGuidanceAgent level 2 failed:', err)
   }
 
-  // Level 3: Gemini 1.5 Flash (secondary provider fallback)
+  // Level 3: Gemini 2.0 Flash (secondary provider fallback)
   try {
-    return await tryGemini(prompt)
+    const result = await tryGemini(prompt)
+    if (isHollowGuidance(result)) throw new Error('Output guardrail: hollow result from level 3')
+    return result
   } catch (err) {
     console.error('CareerGuidanceAgent level 3 failed:', err)
   }

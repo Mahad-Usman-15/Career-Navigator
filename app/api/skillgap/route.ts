@@ -6,6 +6,23 @@ const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string
 import { analyzeSkillGap } from '@/lib/agents/SkillAnalyzerAgent'
 import { sanitizeInput } from '@/lib/sanitize'
 
+// Input guardrail — detects gibberish before sending to AI
+function isGibberish(text: string): boolean {
+  const t = text.trim().toLowerCase()
+  if (t.length < 5) return true
+  const noSpaces = t.replace(/\s+/g, '')
+  // Character diversity: unique chars / total chars — "mmmmm" = 1/5 = 0.2, fail at < 0.15
+  const diversity = new Set(noSpaces).size / noSpaces.length
+  if (diversity < 0.15) return true
+  // Vowel ratio: real language always has vowels
+  const vowels = (t.match(/[aeiou]/g) || []).length
+  if (noSpaces.length > 0 && vowels / noSpaces.length < 0.05) return true
+  // At least 2 real words (2+ chars)
+  const realWords = t.split(/\s+/).filter(w => w.length >= 2)
+  if (realWords.length < 2) return true
+  return false
+}
+
 // POST /api/skillgap
 // Constitution Principle I (layer 2) + Principle II: userId from session only
 // Constitution Principle III: Zod validate inside agent before DB write
@@ -22,6 +39,20 @@ export async function POST(req: NextRequest) {
 
     if (!jobDescription || !jobDescription.trim()) {
       return NextResponse.json({ error: 'Missing job description' }, { status: 400 })
+    }
+
+    // Input guardrail — reject gibberish before reaching AI
+    if (jobDescription.trim().length < 100) {
+      return NextResponse.json(
+        { error: 'Job description is too short. Please paste the full job posting (at least 100 characters).' },
+        { status: 422 }
+      )
+    }
+    if (isGibberish(jobDescription)) {
+      return NextResponse.json(
+        { error: 'Job description does not appear to be a real job posting. Please paste an actual job description.' },
+        { status: 422 }
+      )
     }
 
     let extractedText: string
@@ -46,6 +77,14 @@ export async function POST(req: NextRequest) {
       resumeSource = 'text'
     } else {
       return NextResponse.json({ error: 'Missing resume or job description' }, { status: 400 })
+    }
+
+    // Input guardrail — reject gibberish resume/skills text
+    if (resumeSource === 'text' && isGibberish(extractedText)) {
+      return NextResponse.json(
+        { error: 'Skills or experience input does not appear to be meaningful. Please describe your actual skills and background.' },
+        { status: 422 }
+      )
     }
 
     // FR-009, FR-010: sanitize before AI call

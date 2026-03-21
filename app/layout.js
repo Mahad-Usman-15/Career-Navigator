@@ -15,8 +15,30 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Career Navigator",
-  description: "Created For Students",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://aipowered-career-navigator.vercel.app"),
+  title: {
+    default: "Career Navigator — AI Career Guidance Pakistan",
+    template: "%s | Career Navigator",
+  },
+  description:
+    "AI-powered career guidance for students and graduates in Pakistan. MBTI assessments, skill gap analysis, and personalized career roadmaps.",
+  openGraph: {
+    siteName: "Career Navigator",
+    type: "website",
+    locale: "en_US",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Career Navigator — AI Career Guidance for Students in Pakistan",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og-image.png"],
+  },
 };
 
 const clerkAppearance = {
@@ -60,6 +82,11 @@ const clerkAppearance = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://clerk.accounts.dev" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://clerk.accounts.dev" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -68,6 +95,40 @@ export default function RootLayout({ children }) {
           {children}
           <Footer />
         </ClerkProvider>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Career Navigator",
+              url: process.env.NEXT_PUBLIC_APP_URL || "https://aipowered-career-navigator.vercel.app",
+              description: "AI-powered career guidance for students and graduates in Pakistan",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: `${process.env.NEXT_PUBLIC_APP_URL || "https://aipowered-career-navigator.vercel.app"}/{search_term_string}`,
+                "query-input": "required name=search_term_string",
+              },
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "EducationalOrganization",
+              name: "Career Navigator",
+              url: process.env.NEXT_PUBLIC_APP_URL || "https://aipowered-career-navigator.vercel.app",
+              description: "AI-powered career guidance platform for students and graduates in Pakistan",
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Karachi",
+                addressCountry: "PK",
+              },
+            }),
+          }}
+        />
         <Analytics />
       </body>
     </html>

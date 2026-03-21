@@ -4,6 +4,20 @@ import { personalityTypes } from "@/components/data/personalityTypes";
 // T011: Dark theme — bg-[#171717] page background, gradient headings, text-white/60 secondary text
 const Index = () => {
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: process.env.NEXT_PUBLIC_APP_URL },
+              { "@type": "ListItem", position: 2, name: "Personality Types", item: `${process.env.NEXT_PUBLIC_APP_URL}/personalitytypes` },
+            ],
+          }),
+        }}
+      />
     <div className="min-h-screen" style={{ backgroundColor: '#171717' }}>
       {/* Hero Section */}
       <header className="relative pt-16 pb-12 md:pt-24 md:pb-16 px-4">
@@ -55,11 +69,22 @@ const Index = () => {
       </main>
 
     </div>
+    </>
   );
 };
 
 export const metadata = {
-  title: "Personality Types | MBTI",
-  description: "Explore the 16 unique personality types and discover your MBTI profile.",
+  title: "MBTI Personality Types — Career Navigator",
+  description:
+    "Explore all 16 MBTI personality types, their traits, strengths, weaknesses, and ideal career paths. Discover which type fits you.",
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_APP_URL}/personalitytypes`,
+  },
+  openGraph: {
+    title: "16 MBTI Personality Types — Career Navigator",
+    description:
+      "Explore all 16 MBTI personality types and find your ideal career match.",
+    url: `${process.env.NEXT_PUBLIC_APP_URL}/personalitytypes`,
+  },
 };
 export default Index;
