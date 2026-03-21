@@ -1,8 +1,39 @@
 import { Target, Compass, Rocket, ArrowRight } from "lucide-react";
+import Link from "next/link";
+
+export const metadata = {
+  title: "About — Career Navigator",
+  description:
+    "Learn how Career Navigator helps students and graduates in Pakistan discover their ideal career paths through MBTI assessments and AI-powered guidance.",
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_APP_URL}/about`,
+  },
+  openGraph: {
+    title: "About Career Navigator",
+    description:
+      "Learn how Career Navigator helps students and graduates in Pakistan discover their ideal career paths.",
+    url: `${process.env.NEXT_PUBLIC_APP_URL}/about`,
+  },
+};
+
 export default function AboutPage() {
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: process.env.NEXT_PUBLIC_APP_URL },
+              { "@type": "ListItem", position: 2, name: "About", item: `${process.env.NEXT_PUBLIC_APP_URL}/about` },
+            ],
+          }),
+        }}
+      />
     <main className="min-h-screen bg-[#171717]">
-    
+
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-6">
@@ -55,41 +86,41 @@ export default function AboutPage() {
               </p>
             </div>
             <div className="relative">
-              <div className="aspect-square rounded-3xl bg-linear-to-br from-blue-600/20 to-cyan-500/20 border border-white/10 flex items-center justify-center overflow-hidden">
+              <div className="rounded-3xl bg-linear-to-br from-blue-600/20 to-cyan-500/20 border border-white/10 flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 bg-linear-to-br from-blue-500/10 to-transparent" />
-                <div className="relative z-10 p-8">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                      <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4">
-                        <svg className="w-6 h-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="relative z-10 p-4 sm:p-8 w-full">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div className="p-4 sm:p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-500/20 flex items-center justify-center mb-3 sm:mb-4">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                         </svg>
                       </div>
-                      <p className="text-white font-medium">Self-Awareness</p>
+                      <p className="text-white font-medium text-sm sm:text-base">Self-Awareness</p>
                     </div>
-                    <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                      <div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center mb-4">
-                        <svg className="w-6 h-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="p-4 sm:p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center mb-3 sm:mb-4">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
                       </div>
-                      <p className="text-white font-medium">Empowerment</p>
+                      <p className="text-white font-medium text-sm sm:text-base">Empowerment</p>
                     </div>
-                    <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                      <div className="w-12 h-12 rounded-xl bg-blue-400/20 flex items-center justify-center mb-4">
-                        <svg className="w-6 h-6 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="p-4 sm:p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-400/20 flex items-center justify-center mb-3 sm:mb-4">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                         </svg>
                       </div>
-                      <p className="text-white font-medium">Confidence</p>
+                      <p className="text-white font-medium text-sm sm:text-base">Confidence</p>
                     </div>
-                    <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                      <div className="w-12 h-12 rounded-xl bg-cyan-400/20 flex items-center justify-center mb-4">
-                        <svg className="w-6 h-6 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="p-4 sm:p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-cyan-400/20 flex items-center justify-center mb-3 sm:mb-4">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                         </svg>
                       </div>
-                      <p className="text-white font-medium">Global Reach</p>
+                      <p className="text-white font-medium text-sm sm:text-base">Global Reach</p>
                     </div>
                   </div>
                 </div>
@@ -253,6 +284,88 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Meet the Creator Section */}
+      <section className="py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-block px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-4">
+              <span className="text-cyan-400 text-sm font-medium">The Person Behind It</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold">
+              <span className="bg-linear-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">Meet the Creator</span>
+            </h2>
+          </div>
+
+          <div className="max-w-3xl mx-auto">
+            <div className="rounded-3xl bg-white/5 border border-white/10 p-8 md:p-12">
+              {/* Avatar + Name */}
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8">
+                <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-blue-500 to-cyan-400 flex items-center justify-center shrink-0 text-3xl font-bold text-white">
+                  MU
+                </div>
+                <div className="text-center sm:text-left">
+                  <h3 className="text-2xl font-bold text-white">Mahad Usman</h3>
+                  <p className="text-cyan-400 font-medium mt-1">AI Enthusiast &amp; Developer</p>
+                  <a
+                    href="mailto:mahadusman2008@gmail.com"
+                    className="text-white/50 text-sm mt-1 inline-block hover:text-cyan-400 transition-colors"
+                  >
+                    mahadusman2008@gmail.com
+                  </a>
+                </div>
+              </div>
+
+              {/* Story */}
+              <div className="mb-8 space-y-4 text-white/70 leading-relaxed">
+                <p>
+                  I built Career Navigator because I saw a real problem — many students struggle to choose the right career, and freshers keep getting rejected despite sending dozens of CVs. The reason isn&apos;t a lack of potential. It&apos;s a skill gap that no one ever pointed out to them.
+                </p>
+                <p>
+                  Career Navigator gives every student a complete, AI-generated career roadmap based on their personality and IQ — and a detailed skill gap report so they know exactly what to fix before they apply. No more guessing. No more rejections from preventable gaps.
+                </p>
+              </div>
+
+              {/* Social Links */}
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href="https://www.linkedin.com/in/mahad-usman-45497a353"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:border-blue-500/50 hover:bg-blue-500/10 transition-all text-sm"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                  </svg>
+                  LinkedIn
+                </a>
+                <a
+                  href="https://github.com/Mahad-Usman-15"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:border-white/30 hover:bg-white/10 transition-all text-sm"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                  </svg>
+                  GitHub
+                </a>
+                <a
+                  href="https://x.com/MahadUsmns"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all text-sm"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                  X (Twitter)
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Closing Banner Section */}
       <section className="py-20 px-6">
         <div className="max-w-7xl mx-auto">
@@ -271,10 +384,10 @@ export default function AboutPage() {
                 Join thousands of students and graduates who have discovered 
                 their true career potential with Career Navigator.
               </p>
-              <button className="inline-flex items-center gap-2 px-8 py-4 bg-white text-blue-600 font-semibold rounded-full hover:bg-white/90 transition-colors">
+              <Link href="/careercounselling" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-blue-600 font-semibold rounded-full hover:bg-white/90 transition-colors">
                 Start Your Career Journey
                 <ArrowRight className="w-5 h-5" />
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -282,5 +395,6 @@ export default function AboutPage() {
 
   
     </main>
+    </>
   );
 }
