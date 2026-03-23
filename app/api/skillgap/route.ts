@@ -4,24 +4,8 @@ import { prisma } from '@/lib/db'
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string }>
 import { analyzeSkillGap } from '@/lib/agents/SkillAnalyzerAgent'
+import { validateJobDescription, InputGuardrailTripwireTriggered } from '@/lib/agents/JDGuardrailAgent'
 import { sanitizeInput } from '@/lib/sanitize'
-
-// Input guardrail — detects gibberish before sending to AI
-function isGibberish(text: string): boolean {
-  const t = text.trim().toLowerCase()
-  if (t.length < 5) return true
-  const noSpaces = t.replace(/\s+/g, '')
-  // Character diversity: unique chars / total chars — "mmmmm" = 1/5 = 0.2, fail at < 0.15
-  const diversity = new Set(noSpaces).size / noSpaces.length
-  if (diversity < 0.15) return true
-  // Vowel ratio: real language always has vowels
-  const vowels = (t.match(/[aeiou]/g) || []).length
-  if (noSpaces.length > 0 && vowels / noSpaces.length < 0.05) return true
-  // At least 2 real words (2+ chars)
-  const realWords = t.split(/\s+/).filter(w => w.length >= 2)
-  if (realWords.length < 2) return true
-  return false
-}
 
 // POST /api/skillgap
 // Constitution Principle I (layer 2) + Principle II: userId from session only
@@ -41,18 +25,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing job description' }, { status: 400 })
     }
 
-    // Input guardrail — reject gibberish before reaching AI
+    // Fast length check — no point hitting the AI for a 3-word input
     if (jobDescription.trim().length < 100) {
       return NextResponse.json(
         { error: 'Job description is too short. Please paste the full job posting (at least 100 characters).' },
         { status: 422 }
       )
     }
-    if (isGibberish(jobDescription)) {
-      return NextResponse.json(
-        { error: 'Job description does not appear to be a real job posting. Please paste an actual job description.' },
-        { status: 422 }
-      )
+
+    // AI-powered input guardrail — LLM classifies whether this is a real JD.
+    // Throws InputGuardrailTripwireTriggered if the text is not a valid job posting.
+    try {
+      await validateJobDescription(jobDescription.trim())
+    } catch (err) {
+      if (err instanceof InputGuardrailTripwireTriggered) {
+        const reason: string = (err as any).outputInfo?.reason ?? 'Job description does not appear to be a real job posting. Please paste an actual job description.'
+        return NextResponse.json({ error: reason }, { status: 422 })
+      }
+      throw err
     }
 
     let extractedText: string
@@ -79,10 +69,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing resume or job description' }, { status: 400 })
     }
 
-    // Input guardrail — reject gibberish resume/skills text
-    if (resumeSource === 'text' && isGibberish(extractedText)) {
+    // Basic resume length sanity check
+    if (resumeSource === 'text' && extractedText.trim().length < 10) {
       return NextResponse.json(
-        { error: 'Skills or experience input does not appear to be meaningful. Please describe your actual skills and background.' },
+        { error: 'Skills or experience input is too short. Please describe your actual skills and background.' },
         { status: 422 }
       )
     }

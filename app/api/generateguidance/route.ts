@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth-guard'
 import { prisma } from '@/lib/db'
 import { generateCareerGuidance } from '@/lib/agents/CareerGuidanceAgent'
+import { validateProfileInput, InputGuardrailTripwireTriggered } from '@/lib/agents/ProfileGuardrailAgent'
 import { sanitizeInput } from '@/lib/sanitize'
 
 // POST /api/generateguidance
@@ -37,6 +38,24 @@ export async function POST() {
           ? (assessment.skills as any).skills.map((s: string) => sanitizeInput(s))
           : []
       }
+    }
+
+    // AI-powered input guardrail — LLM checks skills/strengths/aspirations for meaningful content.
+    // Throws InputGuardrailTripwireTriggered if the profile looks like random/gibberish input.
+    try {
+      await validateProfileInput({
+        skills: Array.isArray((sanitizedAssessment.skills as any)?.skills)
+          ? (sanitizedAssessment.skills as any).skills
+          : [],
+        strengths: (sanitizedAssessment.skills as any)?.strengths ?? null,
+        aspirations: (sanitizedAssessment.skills as any)?.aspirations ?? null,
+      })
+    } catch (err) {
+      if (err instanceof InputGuardrailTripwireTriggered) {
+        const reason: string = (err as any).outputInfo?.reason ?? 'Your skills or profile information does not appear to be meaningful. Please update your assessment with real skills and goals.'
+        return NextResponse.json({ error: reason }, { status: 422 })
+      }
+      throw err
     }
 
     let guidance: Awaited<ReturnType<typeof generateCareerGuidance>>
