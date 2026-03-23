@@ -58,6 +58,32 @@ export const Footer = () => {
                 </svg>
               </a>
             </div>
+            <div className="flex items-center gap-3">
+              <a
+                href="https://www.producthunt.com/products/career-navigator?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-career-navigator"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  alt="Career Navigator - AI-powered career guidance for students and graduates. | Product Hunt"
+                  width={250}
+                  height={54}
+                  src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1103569&theme=dark&t=1774275804559"
+                />
+              </a>
+              <a
+                href="https://www.producthunt.com/products/career-navigator?utm_source=badge-follow&utm_medium=badge&utm_source=badge-career-navigator"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  alt="Career Navigator - AI-powered career guidance for students and graduates. | Product Hunt"
+                  width={86}
+                  height={32}
+                  src="https://api.producthunt.com/widgets/embed-image/v1/follow.svg?product_id=1186418&theme=light&size=small"
+                />
+              </a>
+            </div>
             <p className="text-white/40 text-sm">© 2026 Career Navigator. All rights reserved.</p>
           </div>
         </div>
