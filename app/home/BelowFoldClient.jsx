@@ -119,7 +119,7 @@ function VideoPlayer({ title, startTime = 0 }) {
 
 function CareerGuidanceSection() {
   return (
-    <section id="guidance" className="py-24 md:py-32">
+    <section id="demo" className="py-24 md:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="order-2 lg:order-1">
@@ -127,21 +127,21 @@ function CareerGuidanceSection() {
               <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
               </svg>
-              <span className="text-blue-400 text-sm font-medium">Career Guidance</span>
+              <span className="text-blue-400 text-sm font-medium">AI Career Guidance</span>
             </div>
             <GradientHeading className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-              1-on-1 Mentorship That Actually Works
+              AI-Powered Roadmaps Built Around You
             </GradientHeading>
             <p className="text-white/70 text-lg leading-relaxed mb-8">
-              Get paired with industry professionals who&apos;ve walked the path you&apos;re about to
-              take. Our mentors provide personalized guidance, real-world insights, and actionable
-              feedback to accelerate your career journey.
+              Complete your MBTI personality test and timed IQ assessment, then let the AI generate
+              3–5 tailored career paths with step-by-step roadmaps, timelines, and resources —
+              all specific to your profile.
             </p>
             <ul className="space-y-4 mb-8">
               {[
-                "Personalized career roadmaps based on your strengths",
-                "Weekly check-ins with verified industry mentors",
-                "Access to exclusive career resources and workshops",
+                "Personalized career roadmaps based on your MBTI + IQ profile",
+                "3–5 career paths with match scores and market outlook",
+                "Step-by-step timelines with certifications and resources",
               ].map((item, index) => (
                 <li key={index} className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-linear-to-r from-blue-500 to-cyan-500 flex items-center justify-center mt-0.5 shrink-0">
@@ -153,10 +153,10 @@ function CareerGuidanceSection() {
                 </li>
               ))}
             </ul>
-            <Link href="/careercounselling"><Button variant="primary">Find Your Mentor</Button></Link>
+            <Link href="/careercounselling"><Button variant="primary">Start Your Assessment</Button></Link>
           </div>
           <div className="order-1 lg:order-2">
-            <VideoPlayer title="See how mentorship transforms careers" startTime={0} />
+            <VideoPlayer title="See Career Navigator in action" startTime={0} />
           </div>
         </div>
       </div>
@@ -189,10 +189,10 @@ function SkillGapSection() {
             </p>
             <div className="grid grid-cols-2 gap-4 mb-8">
               {[
-                { metric: "500K+", label: "Jobs Analyzed Daily" },
-                { metric: "95%", label: "Skill Match Accuracy" },
-                { metric: "200+", label: "Industries Covered" },
-                { metric: "24hr", label: "Market Updates" },
+                { metric: "PDF", label: "Resume Upload Supported" },
+                { metric: "AI", label: "Powered Gap Analysis" },
+                { metric: "Free", label: "No Credit Card Needed" },
+                { metric: "Instant", label: "Results in Seconds" },
               ].map((item, index) => (
                 <div key={index} className="p-4 rounded-xl bg-white/5 border border-white/10">
                   <div className="text-2xl font-bold bg-linear-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">{item.metric}</div>
@@ -210,22 +210,21 @@ function SkillGapSection() {
 
 function ImpactSection() {
   const stats = [
-    { end: 52847, suffix: "+", label: "Students Guided" },
-    { end: 1200, suffix: "+", label: "Career Paths Explored" },
-    { end: 3500000, suffix: "+", label: "Skills Analyzed" },
-    { end: 94, suffix: "%", label: "Job Readiness Score" },
-    { end: 850, suffix: "+", label: "Partner Companies" },
-    { end: 12500, suffix: "+", label: "Success Stories" },
+    { end: 16, suffix: "", label: "MBTI Personality Types" },
+    { end: 5, suffix: "", label: "Career Paths Per Report" },
+    { end: 100, suffix: "%", label: "Free — No Hidden Fees" },
+    { end: 3, suffix: "", label: "Core Tools in One Place" },
+    { end: 0, suffix: "", label: "Career Counsellors Needed" },
   ];
   return (
     <section id="impact" className="py-24 md:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <GradientHeading className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            Real Impact, Real Results
+            What You Get
           </GradientHeading>
           <p className="text-white/70 text-lg max-w-2xl mx-auto">
-            Numbers that showcase how Career Navigator is transforming career journeys worldwide.
+            Everything a student needs to go from uncertainty to a clear career plan.
           </p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
@@ -259,9 +258,9 @@ function FinalBannerSection() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/careercounselling"><Button variant="primary" className="w-full sm:w-auto text-base px-10 py-4">Start Your Journey Free</Button></Link>
-              <Link href="/careercounselling"><Button variant="ghost" className="w-full sm:w-auto text-base px-10 py-4">Schedule a Demo</Button></Link>
+              <a href="#demo"><Button variant="ghost" className="w-full sm:w-auto text-base px-10 py-4">Watch Demo</Button></a>
             </div>
-            <p className="text-white/50 text-sm mt-6">No credit card required. Free forever for basic features.</p>
+            <p className="text-white/50 text-sm mt-6">No credit card required. Free to use.</p>
           </div>
         </div>
       </div>

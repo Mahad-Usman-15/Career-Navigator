@@ -12,7 +12,7 @@ export default function HeroSection() {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8">
           <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-          <span className="text-white/70 text-sm">Trusted by 50,000+ students worldwide</span>
+          <span className="text-white/70 text-sm">Built for students</span>
         </div>
 
         <h1 className="bg-linear-to-r from-blue-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 text-balance">
@@ -32,12 +32,12 @@ export default function HeroSection() {
           >
             Discover Your Path
           </Link>
-          <Link
-            href="/careercounselling"
+          <a
+            href="#demo"
             className="w-full sm:w-auto px-8 py-4 rounded-lg font-semibold text-base bg-transparent border border-blue-500 text-blue-400 hover:bg-blue-500/10 transition-all duration-300 text-center"
           >
             Watch Demo
-          </Link>
+          </a>
         </div>
 
         {/* Scroll Indicator */}
