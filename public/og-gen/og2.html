@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1270px; height: 760px; overflow: hidden;
+    background: #0a0a0f;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .bg-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .glow-blue {
+    position: absolute; width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(59,130,246,0.25) 0%, transparent 70%);
+    top: -150px; left: -100px;
+  }
+  .glow-cyan {
+    position: absolute; width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(34,211,238,0.15) 0%, transparent 70%);
+    bottom: -100px; right: 100px;
+  }
+  .container {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; gap: 80px;
+    padding: 60px;
+    width: 100%;
+  }
+  .left { flex: 1; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 16px; border-radius: 999px;
+    background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3);
+    color: #60a5fa; font-size: 14px; font-weight: 500; margin-bottom: 24px;
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: #60a5fa; }
+  h1 {
+    font-size: 64px; font-weight: 800; line-height: 1.1; margin-bottom: 20px;
+    color: white;
+  }
+  h1 span {
+    background: linear-gradient(90deg, #3b82f6, #22d3ee);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .tagline {
+    font-size: 20px; color: rgba(255,255,255,0.6); line-height: 1.5; margin-bottom: 32px;
+    max-width: 480px;
+  }
+  .stats { display: flex; gap: 32px; }
+  .stat { }
+  .stat-num { font-size: 32px; font-weight: 700; color: #22d3ee; }
+  .stat-label { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+  .right { width: 420px; }
+  .card {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px; padding: 24px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .card-icon {
+    width: 48px; height: 48px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .card-icon.blue { background: rgba(59,130,246,0.2); }
+  .card-icon.cyan { background: rgba(34,211,238,0.2); }
+  .card-icon.purple { background: rgba(139,92,246,0.2); }
+  .card-title { font-size: 16px; font-weight: 600; color: white; margin-bottom: 4px; }
+  .card-desc { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.4; }
+
+  .logo {
+    position: absolute; top: 40px; left: 60px; z-index: 20;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #3b82f6, #22d3ee);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-text { font-size: 18px; font-weight: 700; color: white; }
+</style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="glow-blue"></div>
+  <div class="glow-cyan"></div>
+
+  <div class="logo">
+    <div class="logo-icon">
+      <svg width="20" height="20" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+      </svg>
+    </div>
+    <span class="logo-text">Career Navigator</span>
+  </div>
+
+  <div class="container">
+    <div class="left">
+      <div class="badge"><div class="dot"></div> AI-Powered Career Guidance</div>
+      <h1>Know Your Path.<br/><span>Before You Start.</span></h1>
+      <p class="tagline">MBTI + IQ assessment meets AI career matching. Built for students and freshers in Pakistan who deserve better than rejection.</p>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-num">16+</div>
+          <div class="stat-label">Personality Types</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">100%</div>
+          <div class="stat-label">AI Generated</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">Free</div>
+          <div class="stat-label">To Use</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="card">
+        <div class="card-icon blue">🧠</div>
+        <div>
+          <div class="card-title">MBTI + IQ Assessment</div>
+          <div class="card-desc">Understand your personality type and cognitive strengths</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon cyan">🗺️</div>
+        <div>
+          <div class="card-title">AI Career Roadmap</div>
+          <div class="card-desc">Personalized paths with timelines tailored to your profile</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon purple">📄</div>
+        <div>
+          <div class="card-title">Skill Gap Analyzer</div>
+          <div class="card-desc">Upload your CV — find exactly what's holding you back</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

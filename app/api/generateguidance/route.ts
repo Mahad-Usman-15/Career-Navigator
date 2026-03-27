@@ -4,6 +4,11 @@ import { prisma } from '@/lib/db'
 import { generateCareerGuidance } from '@/lib/agents/CareerGuidanceAgent'
 import { validateProfileInput, InputGuardrailTripwireTriggered } from '@/lib/agents/ProfileGuardrailAgent'
 import { sanitizeInput } from '@/lib/sanitize'
+import { logger } from '@/lib/logger'
+import { Resend } from 'resend'
+import { CareerReportEmailTemplate } from '@/components/emailtemplate'
+import React from 'react'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 // POST /api/generateguidance
 // Constitution Principle I (layer 2): requireAuth() throws NextResponse 401
@@ -17,9 +22,11 @@ import { sanitizeInput } from '@/lib/sanitize'
 export async function POST() {
   try {
     const userId = await requireAuth()
+    // T052: Rate limit — 10 AI requests per user per 60-min window (ADR-002)
+    await checkRateLimit(userId)
 
-    const assessment = await prisma.career_assessments.findUnique({
-      where: { clerkId: userId }
+    const assessment = await prisma.career_assessments.findFirst({
+      where: { clerkId: userId, isArchived: false }
     })
     if (!assessment) {
       return NextResponse.json(
@@ -86,6 +93,29 @@ export async function POST() {
         overallTimeline: guidance.overallTimeline as any
       }
     })
+
+    // T041: Fire-and-forget email notification — never block the response
+    ;(async () => {
+      try {
+        const { currentUser } = await import('@clerk/nextjs/server')
+        const clerkUser = await currentUser()
+        const userEmail = clerkUser?.emailAddresses?.[0]?.emailAddress
+        if (userEmail && process.env.RESEND_API_KEY) {
+          const resend = new Resend(process.env.RESEND_API_KEY)
+          await resend.emails.send({
+            from: 'Career Navigator <onboarding@resend.dev>',
+            to: userEmail,
+            subject: 'Your Career Report is Ready',
+            react: React.createElement(CareerReportEmailTemplate, {
+              firstName: clerkUser?.firstName ?? undefined,
+              dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
+            })
+          })
+        }
+      } catch (emailErr) {
+        logger.warn({ event: 'guidance_email_failed', userId, error: emailErr })
+      }
+    })()
 
     return NextResponse.json(
       { success: true, data: { recommendations: record.recommendations, overallTimeline: record.overallTimeline } },

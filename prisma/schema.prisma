@@ -3,13 +3,14 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model career_assessments {
   id            String   @id @default(cuid())
-  clerkId       String   @unique
+  clerkId       String
   name          String
   email         String?
   age           Int
@@ -18,17 +19,19 @@ model career_assessments {
   iq            Json
   skills        Json
   isComplete    Boolean  @default(true)
+  isArchived    Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   career_guidance career_guidance[]
 
-  @@index([clerkId])
+  @@index([clerkId, isArchived])
 }
 
 model career_guidance {
   id                 String             @id @default(cuid())
   clerkId            String
+  shareToken         String?            @unique
   assessmentId       String
   assessment         career_assessments @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
   assessmentSnapshot Json
@@ -39,6 +42,7 @@ model career_guidance {
   updatedAt          DateTime           @updatedAt
 
   @@index([clerkId])
+  @@index([shareToken])
 }
 
 model skill_gaps {
@@ -48,6 +52,7 @@ model skill_gaps {
   resumeContent  String
   jobDescription String
   analysis       Json
+  resources      Json?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -63,4 +68,14 @@ model users {
   createdAt DateTime @default(now())
 
   @@index([clerkId])
+}
+
+model job_cache {
+  id              String   @id @default(cuid())
+  careerPathTitle String   @unique
+  listings        Json
+  fetchedAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([careerPathTitle])
 }

@@ -93,12 +93,22 @@ const steps = [
   { id: 6, title: "Aspirations", icon: CheckCircle2 },
 ]
 
+const AI_LOADING_STEPS = [
+  'Scoring your assessment…',
+  'Matching career paths…',
+  'Building your roadmap…',
+  'Preparing your results…',
+]
+
 export default function CareerCounsellor() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const [isCompleted, setIsCompleted] = useState(false)
+  const [stepErrors, setStepErrors] = useState({})
   // guidanceStep: 'idle' | 'generating' | 'done' | 'error'
   const [guidanceStep, setGuidanceStep] = useState('idle')
+  // T022: cycling AI loading step label
+  const [aiLoadingStep, setAiLoadingStep] = useState(0)
   const [careerPaths, setCareerPaths] = useState([])
 
   // Form data
@@ -224,10 +234,16 @@ export default function CareerCounsellor() {
       toast("success", "Assessment saved! Generating your career paths…");
 
       // FR-001: automatically trigger guidance generation after assessment save
+      // T022: start cycling AI loading steps
       setGuidanceStep('generating');
+      setAiLoadingStep(0);
+      const loadingInterval = setInterval(() => {
+        setAiLoadingStep(prev => (prev + 1) % AI_LOADING_STEPS.length);
+      }, 3000);
       try {
         const guidanceResponse = await fetch('/api/generateguidance', { method: 'POST' });
         const data = await guidanceResponse.json();
+        clearInterval(loadingInterval);
         if (guidanceResponse.ok && data.data?.recommendations) {
           setCareerPaths(data.data.recommendations.slice(0, 3));
           setGuidanceStep('done');
@@ -236,6 +252,7 @@ export default function CareerCounsellor() {
           setGuidanceStep('error');
         }
       } catch {
+        clearInterval(loadingInterval);
         setGuidanceStep('error');
       }
 
@@ -330,7 +347,20 @@ export default function CareerCounsellor() {
           <div className="p-8 rounded-2xl bg-white/5 border border-white/10">
             <div className="flex flex-col items-center gap-4">
               <div className="w-10 h-10 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin" />
-              <p className="text-white/80 text-lg">Generating your career paths…</p>
+              {/* T022: cycling AI loading step names */}
+              <p className="text-white/80 text-lg transition-opacity duration-500">
+                {AI_LOADING_STEPS[aiLoadingStep]}
+              </p>
+              <div className="flex gap-1.5 mt-2">
+                {AI_LOADING_STEPS.map((_, i) => (
+                  <div
+                    key={i}
+                    className={`h-1.5 w-6 rounded-full transition-colors duration-500 ${
+                      i === aiLoadingStep ? 'bg-cyan-400' : 'bg-white/10'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -381,9 +411,13 @@ export default function CareerCounsellor() {
             {/* Modal Header */}
             <div className="shrink-0 p-6 border-b border-white/10">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold bg-linear-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                  Career Assessment
-                </h2>
+                <div>
+                  <h2 className="text-xl font-semibold bg-linear-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                    Career Assessment
+                  </h2>
+                  {/* T021: step counter text */}
+                  <p className="text-white/40 text-xs mt-0.5">Step {currentStep} of {steps.length}</p>
+                </div>
                 <button
                   onClick={() => setIsModalOpen(false)}
                   className="p-2 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors"

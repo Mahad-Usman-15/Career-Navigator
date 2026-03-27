@@ -16,7 +16,7 @@ export async function GET() {
 
     // FR-F01: parallel queries — single server request
     const [assessment, guidance, skillGap] = await Promise.all([
-      prisma.career_assessments.findUnique({ where: { clerkId: userId } }),
+      prisma.career_assessments.findFirst({ where: { clerkId: userId, isArchived: false } }),
       prisma.career_guidance.findFirst({
         where: { clerkId: userId },
         orderBy: { generatedAt: 'desc' }

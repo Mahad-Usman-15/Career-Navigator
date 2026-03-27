@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import { Compass, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { GradientButton } from "./gradientbutton";
 import {
   SignInButton,
@@ -13,6 +14,12 @@ import {
 } from '@clerk/nextjs'
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  // T020: Close mobile menu on every route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
 
   const navLinks = [
     { label: "Home", href: "/" },
@@ -26,7 +33,7 @@ const Navbar = () => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="fixed top-0 left-0 right-0 z-50 px-6 py-4"
+      className="fixed top-0 left-0 right-0 z-50 px-6 py-4 print:hidden"
     >
       <div className="max-w-7xl mx-auto">
         <div className="glass rounded-2xl px-6 py-3">

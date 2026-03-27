@@ -183,9 +183,8 @@ function SkillGapSection() {
               Know Exactly What Skills You Need
             </GradientHeading>
             <p className="text-white/70 text-lg leading-relaxed mb-8">
-              Our AI analyzes thousands of job postings in real-time to identify the exact skills
-              employers want. Compare your current abilities against market demands and get a
-              personalized learning path to close the gap.
+              Our AI compares your resume against any job description to surface exactly what skills
+              are missing. Get a personalized learning roadmap to close the gap and land the job.
             </p>
             <div className="grid grid-cols-2 gap-4 mb-8">
               {[
@@ -253,8 +252,8 @@ function FinalBannerSection() {
               Your Future Career Starts Today
             </GradientHeading>
             <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-              Join thousands of students who&apos;ve transformed uncertainty into clarity. Take the
-              first step toward a career you&apos;ll love with Career Navigator by your side.
+              Take the first step toward a career that fits who you are. Career Navigator gives you
+              the clarity and direction you need — completely free.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/careercounselling"><Button variant="primary" className="w-full sm:w-auto text-base px-10 py-4">Start Your Journey Free</Button></Link>

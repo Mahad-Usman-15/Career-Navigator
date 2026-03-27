@@ -38,26 +38,28 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
   }
 
-  // T044: Handle user.created only — ignore all other event types (Assumption 3)
-  if (event.type !== 'user.created') {
-    return NextResponse.json({ received: true })
+  if (event.type === 'user.created') {
+    // Upsert user record — idempotent (FR-021)
+    const { id, first_name, last_name, email_addresses } = event.data
+    const name = `${first_name ?? ''} ${last_name ?? ''}`.trim()
+    const email = email_addresses?.[0]?.email_address ?? ''
+
+    await prisma.users.upsert({
+      where: { clerkId: id },
+      update: {},  // no-op on duplicate — idempotent
+      create: { clerkId: id, name, email }
+    })
+  } else if (event.type === 'user.deleted') {
+    // ADR-006: invalidate all share tokens so existing links return 404
+    const { id } = event.data
+    if (id) {
+      await prisma.career_guidance.updateMany({
+        where: { clerkId: id },
+        data: { shareToken: null }
+      })
+    }
   }
 
-  // T045: Upsert user record — idempotent (FR-021)
-  const { id, first_name, last_name, email_addresses } = event.data
-  const name = `${first_name ?? ''} ${last_name ?? ''}`.trim()
-  const email = email_addresses?.[0]?.email_address ?? ''
-
-  await prisma.users.upsert({
-    where: { clerkId: id },
-    update: {},  // no-op on duplicate — idempotent
-    create: {
-      clerkId: id,
-      name,
-      email
-    }
-  })
-
-  // FR-022: Return 200 immediately — delayed responses cause Clerk retries
+  // Return 200 immediately — delayed responses cause Clerk retries
   return NextResponse.json({ received: true })
 }

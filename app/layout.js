@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import Navbar from "@/components/navbar";
 import  { Footer } from "@/components/footer";
 import { Analytics } from "@vercel/analytics/next";
+import { Toaster } from "sonner";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -94,6 +95,7 @@ export default function RootLayout({ children }) {
           <Navbar />
           {children}
           <Footer />
+          <Toaster position="top-right" richColors theme="dark" />
         </ClerkProvider>
         <script
           type="application/ld+json"

@@ -167,67 +167,52 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       ? data.skills.split(',').map((s: string) => s.trim()).filter((s: string) => s.length > 0)
       : []
 
-    const record = await prisma.career_assessments.upsert({
-      where: { clerkId: userId },
-      update: {
-        name: data.name,
-        email: data.email || null,
-        age: parseInt(data.age),
-        qualification: data.current_qualification,
-        personality: {
-          type: mbtiResult.type,
-          dimensions: mbtiResult.dimensions,
-          scores: mbtiResult.scores,
-          mbtiAnswers: data.mbtiAnswers,
-          evaluatedAt: new Date().toISOString()
-        },
-        iq: {
-          rawScore: iqResult.rawScore,
-          correctAnswers: iqResult.correctAnswers,
-          mentalAge: iqResult.mentalAge,
-          chronologicalAge: iqResult.chronologicalAge,
-          iq_score: iqResult.iq_score,
-          iqAnswers: data.iqAnswers,
-          assessedAt: new Date().toISOString()
-        },
-        skills: {
-          skills: skillsArray,
-          interests: [],
-          strengths: data.strengths || '',
-          aspirations: data.aspirations || ''
-        },
-        isComplete: true
+    // T023: Archive any existing active assessment before creating a new one
+    // This preserves history (isArchived: true) while the new submission becomes active
+    const assessmentData = {
+      name: data.name,
+      email: data.email || null,
+      age: parseInt(data.age),
+      qualification: data.current_qualification,
+      personality: {
+        type: mbtiResult.type,
+        dimensions: mbtiResult.dimensions,
+        scores: mbtiResult.scores,
+        mbtiAnswers: data.mbtiAnswers,
+        evaluatedAt: new Date().toISOString()
       },
-      create: {
-        clerkId: userId,
-        name: data.name,
-        email: data.email || null,
-        age: parseInt(data.age),
-        qualification: data.current_qualification,
-        personality: {
-          type: mbtiResult.type,
-          dimensions: mbtiResult.dimensions,
-          scores: mbtiResult.scores,
-          mbtiAnswers: data.mbtiAnswers,
-          evaluatedAt: new Date().toISOString()
-        },
-        iq: {
-          rawScore: iqResult.rawScore,
-          correctAnswers: iqResult.correctAnswers,
-          mentalAge: iqResult.mentalAge,
-          chronologicalAge: iqResult.chronologicalAge,
-          iq_score: iqResult.iq_score,
-          iqAnswers: data.iqAnswers,
-          assessedAt: new Date().toISOString()
-        },
-        skills: {
-          skills: skillsArray,
-          interests: [],
-          strengths: data.strengths || '',
-          aspirations: data.aspirations || ''
-        },
-        isComplete: true
-      }
+      iq: {
+        rawScore: iqResult.rawScore,
+        correctAnswers: iqResult.correctAnswers,
+        mentalAge: iqResult.mentalAge,
+        chronologicalAge: iqResult.chronologicalAge,
+        iq_score: iqResult.iq_score,
+        iqAnswers: data.iqAnswers,
+        assessedAt: new Date().toISOString()
+      },
+      skills: {
+        skills: skillsArray,
+        interests: [],
+        strengths: data.strengths || '',
+        aspirations: data.aspirations || ''
+      },
+      isComplete: true
+    }
+
+    const existing = await prisma.career_assessments.findFirst({
+      where: { clerkId: userId, isArchived: false }
+    })
+
+    // T023: Archive existing record (preserves history) then always create fresh record
+    if (existing) {
+      await prisma.career_assessments.update({
+        where: { id: existing.id },
+        data: { isArchived: true }
+      })
+    }
+
+    const record = await prisma.career_assessments.create({
+      data: { clerkId: userId, ...assessmentData }
     })
 
     return NextResponse.json({
@@ -253,8 +238,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     // Constitution Principle I (layer 2) + Principle II: userId from session only
     const userId = await requireAuth()
 
-    const record = await prisma.career_assessments.findUnique({
-      where: { clerkId: userId }
+    const record = await prisma.career_assessments.findFirst({
+      where: { clerkId: userId, isArchived: false }
     })
 
     if (!record) {

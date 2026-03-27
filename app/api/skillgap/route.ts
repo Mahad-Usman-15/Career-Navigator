@@ -6,6 +6,9 @@ const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string
 import { analyzeSkillGap } from '@/lib/agents/SkillAnalyzerAgent'
 import { validateJobDescription, InputGuardrailTripwireTriggered } from '@/lib/agents/JDGuardrailAgent'
 import { sanitizeInput } from '@/lib/sanitize'
+import { ResourceSearchAgent } from '@/lib/agents/ResourceSearchAgent'
+import { logger } from '@/lib/logger'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 // POST /api/skillgap
 // Constitution Principle I (layer 2) + Principle II: userId from session only
@@ -15,6 +18,8 @@ import { sanitizeInput } from '@/lib/sanitize'
 export async function POST(req: NextRequest) {
   try {
     const userId = await requireAuth()
+    // T051: Rate limit — 10 AI requests per user per 60-min window (ADR-002)
+    await checkRateLimit(userId)
 
     const formData = await req.formData()
     const resumeFile = formData.get('resume') as File | null
@@ -92,19 +97,33 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Save to DB
+    // T028: Search for learning resources for missing skills via Tavily (ADR-003)
+    // Graceful degradation: if ResourceSearchAgent fails, analysis is still saved
+    let resources = null
+    const missingSkills: string[] = analysis.missingSkills ?? []
+    if (missingSkills.length > 0) {
+      try {
+        resources = await ResourceSearchAgent(missingSkills.slice(0, 4))
+      } catch (err) {
+        logger.warn({ event: 'resource_search_failed', userId, error: err })
+        // continue without resources — do not fail the request
+      }
+    }
+
+    // Save to DB including resources column (may be null)
     await prisma.skill_gaps.create({
       data: {
         clerkId: userId,
         resumeSource,
         resumeContent: extractedText,
         jobDescription: jobDescription.trim(),
-        analysis: analysis as any
+        analysis: analysis as any,
+        resources: resources as any ?? undefined
       }
     })
 
-    // Return analysis at top level (not nested under data) — matches client expectation
-    return NextResponse.json({ success: true, analysis }, { status: 201 })
+    // Return analysis + resources (resources may be null — client handles gracefully)
+    return NextResponse.json({ success: true, analysis: { ...analysis, resources } }, { status: 201 })
 
   } catch (error) {
     // CRITICAL: instanceof check passes through 401 from requireAuth()

@@ -305,6 +305,55 @@
   color: #888;
 }
 
+@media print {
+  /* Force white background and dark text throughout */
+  *, *::before, *::after {
+    background: white !important;
+    background-color: white !important;
+    color: #111 !important;
+    border-color: #ddd !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Fix gradient text — restore visible black text */
+  [class*="bg-clip-text"],
+  [class*="bg-gradient"] {
+    -webkit-text-fill-color: #111 !important;
+    color: #111 !important;
+    background: none !important;
+  }
+
+  /* Progress bars — keep them visible in blue */
+  [style*="width"] {
+    background-color: #1d4ed8 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Skill tags */
+  .text-\[\#f87171\] { color: #b91c1c !important; }
+  .text-\[\#4ade80\] { color: #15803d !important; }
+
+  /* Page layout */
+  body {
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  /* Avoid page breaks inside cards */
+  [class*="rounded-2xl"],
+  [class*="rounded-xl"] {
+    break-inside: avoid;
+    border: 1px solid #e5e7eb !important;
+    margin-bottom: 12pt;
+    padding: 12pt !important;
+  }
+
+  h1 { font-size: 18pt !important; font-weight: 700 !important; }
+  h2 { font-size: 13pt !important; font-weight: 600 !important; margin-bottom: 8pt !important; }
+}
+
 
 
 

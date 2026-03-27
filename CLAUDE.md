@@ -1,4 +1,4 @@
-# Career Navigator — Architecture Reference
+﻿# Career Navigator — Architecture Reference
 
 ## Overview
 

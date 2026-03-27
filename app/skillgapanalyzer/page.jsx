@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import SkillGapAnalyzerClient from './SkillGapAnalyzerClient'
+import ErrorBoundary from '@/components/ErrorBoundary'
 
 export const metadata = {
   title: "Skill Gap Analyzer — Career Navigator",
@@ -10,16 +11,20 @@ export const metadata = {
   alternates: {
     canonical: `${process.env.NEXT_PUBLIC_APP_URL}/skillgapanalyzer`,
   },
+  openGraph: {
+    images: [`${process.env.NEXT_PUBLIC_APP_URL}/api/og?title=Skill+Gap+Analyzer&description=Upload+your+resume+and+find+exactly+what+skills+you%27re+missing`],
+  },
 };
 
 // FR-011: Server-side auth guard — unauthenticated visitors are redirected
-// before any page content is rendered (not client-side)
+// T019: Wrapped with ErrorBoundary so AI failures don't crash the full page
 export default async function SkillGapAnalyzerPage() {
   const { userId } = await auth()
+  if (!userId) redirect('/sign-in')
 
-  if (!userId) {
-    redirect('/sign-in')
-  }
-
-  return <SkillGapAnalyzerClient />
+  return (
+    <ErrorBoundary>
+      <SkillGapAnalyzerClient />
+    </ErrorBoundary>
+  )
 }
