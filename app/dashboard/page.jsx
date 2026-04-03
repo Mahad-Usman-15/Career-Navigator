@@ -61,6 +61,12 @@ export default async function DashboardPage() {
     analyzedAt: rawSkillGap.createdAt
   } : null
 
+  // Nudge card state (FR-021, FR-022, FR-023)
+  const hasAssessment = rawAssessment !== null
+  const hasSkillGap = rawSkillGap !== null
+  const showNudge = hasAssessment !== hasSkillGap // XOR
+  const nudgeTarget = hasAssessment ? 'skillgap' : 'assessment'
+
   const courses = rawSkillGap?.resources?.courses?.slice(0, 4) ?? []
 
   // T035: Job listings — direct DB query (constitution §Dashboard: server-side, not client-side fetch)
@@ -112,6 +118,30 @@ export default async function DashboardPage() {
           </h1>
           <p className="text-white/60 mt-1">Your career profile at a glance.</p>
         </div>
+
+        {/* Nudge card — appears when only one of the two features is complete */}
+        {showNudge && (
+          <div className="rounded-2xl p-5 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 print:hidden">
+            <div>
+              <p className="text-white font-medium">
+                {nudgeTarget === 'skillgap'
+                  ? 'You have your career paths — now find your skill gaps'
+                  : 'You have your skill gap report — now discover your career paths'}
+              </p>
+              <p className="text-white/50 text-sm mt-0.5">
+                {nudgeTarget === 'skillgap'
+                  ? 'Upload your resume to see exactly which skills you need for your top career match.'
+                  : 'Complete the 10-minute assessment to get AI-powered career path recommendations.'}
+              </p>
+            </div>
+            <Link
+              href={nudgeTarget === 'skillgap' ? '/skillgapanalyzer' : '/careercounselling'}
+              className="shrink-0 px-5 py-2 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 transition-opacity whitespace-nowrap"
+            >
+              {nudgeTarget === 'skillgap' ? 'Scan Skill Gap →' : 'Start Assessment →'}
+            </Link>
+          </div>
+        )}
 
         {/* Assessment Cards row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

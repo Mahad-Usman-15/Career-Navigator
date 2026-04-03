@@ -30,7 +30,7 @@ export default function HeroSection() {
             href="/careercounselling"
             className="w-full sm:w-auto px-8 py-4 rounded-lg font-semibold text-base bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:from-blue-700 hover:to-cyan-600 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 text-center"
           >
-            Discover Your Path
+            Take Free Assessment – 5 mins
           </Link>
           <a
             href="#demo"

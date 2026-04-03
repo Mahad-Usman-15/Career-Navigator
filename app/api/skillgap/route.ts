@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth-guard'
 import { prisma } from '@/lib/db'
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string }>
+import { revalidateTag } from 'next/cache'
 import { analyzeSkillGap } from '@/lib/agents/SkillAnalyzerAgent'
 import { validateJobDescription, InputGuardrailTripwireTriggered } from '@/lib/agents/JDGuardrailAgent'
 import { sanitizeInput } from '@/lib/sanitize'
@@ -55,6 +54,8 @@ export async function POST(req: NextRequest) {
 
     if (resumeFile && resumeFile.size > 0) {
       // PDF path — Constitution Principle IV: extract text, never store binary
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string }>
       const buffer = Buffer.from(await resumeFile.arrayBuffer())
       const parsed = await pdfParse(buffer)
       extractedText = parsed.text.trim()
@@ -121,6 +122,7 @@ export async function POST(req: NextRequest) {
         resources: resources as any ?? undefined
       }
     })
+    revalidateTag(`dashboard-${userId}`, 'max')
 
     // Return analysis + resources (resources may be null — client handles gracefully)
     return NextResponse.json({ success: true, analysis: { ...analysis, resources } }, { status: 201 })

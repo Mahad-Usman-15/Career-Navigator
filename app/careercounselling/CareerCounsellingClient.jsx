@@ -107,6 +107,7 @@ export default function CareerCounsellor() {
   const [stepErrors, setStepErrors] = useState({})
   // guidanceStep: 'idle' | 'generating' | 'done' | 'error'
   const [guidanceStep, setGuidanceStep] = useState('idle')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   // T022: cycling AI loading step label
   const [aiLoadingStep, setAiLoadingStep] = useState(0)
   const [careerPaths, setCareerPaths] = useState([])
@@ -224,6 +225,7 @@ export default function CareerCounsellor() {
   }
 
   const handleComplete = async () => {
+    setIsSubmitting(true)
     try {
       const result = await submitAssessmentData();
 
@@ -254,9 +256,11 @@ export default function CareerCounsellor() {
       } catch {
         clearInterval(loadingInterval);
         setGuidanceStep('error');
+        toast("error", "Career guidance generation failed. You can view your assessment on the dashboard.");
       }
 
     } catch (error) {
+      setIsSubmitting(false)
       const msg = error?.message || 'Failed to save assessment. Please try again.';
       toast("error", msg);
       console.error(error);
@@ -383,11 +387,30 @@ export default function CareerCounsellor() {
               </div>
             ))}
           </div>
-          <div className="text-center mt-6">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
             <a href="/dashboard" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-medium hover:scale-105 transition-transform">
               View Full Results on Dashboard
               <ChevronRight className="w-4 h-4" />
             </a>
+            <button
+              onClick={async () => {
+                try {
+                  const res = await fetch('/api/report/share', { method: 'POST' })
+                  const data = await res.json()
+                  if (res.ok && data.shareUrl) {
+                    await navigator.clipboard.writeText(data.shareUrl)
+                    toast("success", "Share link copied to clipboard!")
+                  } else {
+                    toast("error", "Could not generate share link. Please try again.")
+                  }
+                } catch {
+                  toast("error", "Could not generate share link. Please try again.")
+                }
+              }}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-medium hover:bg-white/20 transition-colors"
+            >
+              Share Your Result
+            </button>
           </div>
         </section>
       )}
@@ -868,11 +891,11 @@ export default function CareerCounsellor() {
               ) : (
                 <button
                   onClick={handleComplete}
-                  disabled={!canProceed()}
+                  disabled={!canProceed() || isSubmitting}
                   className="flex items-center gap-2 px-6 py-3 rounded-xl bg-linear-to-r from-green-500 to-emerald-500 text-white font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-green-500/25 transition-all"
                 >
                   <CheckCircle2 className="w-5 h-5" />
-                  Complete Assessment
+                  {isSubmitting ? 'Saving…' : 'Complete Assessment'}
                 </button>
               )}
             </div>

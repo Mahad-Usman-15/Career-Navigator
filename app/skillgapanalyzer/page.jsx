@@ -1,5 +1,4 @@
 import { auth } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
 import SkillGapAnalyzerClient from './SkillGapAnalyzerClient'
 import ErrorBoundary from '@/components/ErrorBoundary'
 
@@ -16,15 +15,15 @@ export const metadata = {
   },
 };
 
-// FR-011: Server-side auth guard — unauthenticated visitors are redirected
-// T019: Wrapped with ErrorBoundary so AI failures don't crash the full page
+// FR-006: Page is accessible without auth — unauthenticated users see demo mode
+// Authenticated users see the full form unchanged
+// Note: /api/skillgap remains protected in proxy.js (isProtectedApiRoute)
 export default async function SkillGapAnalyzerPage() {
   const { userId } = await auth()
-  if (!userId) redirect('/sign-in')
 
   return (
     <ErrorBoundary>
-      <SkillGapAnalyzerClient />
+      <SkillGapAnalyzerClient isAuthenticated={!!userId} />
     </ErrorBoundary>
   )
 }

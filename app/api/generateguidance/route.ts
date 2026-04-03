@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth-guard'
 import { prisma } from '@/lib/db'
+import { revalidateTag } from 'next/cache'
 import { generateCareerGuidance } from '@/lib/agents/CareerGuidanceAgent'
 import { validateProfileInput, InputGuardrailTripwireTriggered } from '@/lib/agents/ProfileGuardrailAgent'
 import { sanitizeInput } from '@/lib/sanitize'
@@ -93,6 +94,7 @@ export async function POST() {
         overallTimeline: guidance.overallTimeline as any
       }
     })
+    revalidateTag(`dashboard-${userId}`, 'max')
 
     // T041: Fire-and-forget email notification — never block the response
     ;(async () => {

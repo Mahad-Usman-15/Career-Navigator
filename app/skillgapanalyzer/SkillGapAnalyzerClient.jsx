@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
+import { SignUpButton } from "@clerk/nextjs";
+
+const DEMO_STORAGE_KEY = 'skillgap_demo_pending';
 
 // T026: Multi-step AI loading labels
 const AI_LOADING_STEPS = [
@@ -16,7 +19,7 @@ const MAX_PDF_SIZE_MB = 5;
 const JD_MIN_LENGTH = 100;
 const JD_MAX_LENGTH = 5000;
 
-export default function SkillGapAnalyzerClient() {
+export default function SkillGapAnalyzerClient({ isAuthenticated = true }) {
   const [inputMethod, setInputMethod] = useState("form");
   const [skills, setSkills] = useState("");
   const [experience, setExperience] = useState("");
@@ -29,6 +32,36 @@ export default function SkillGapAnalyzerClient() {
   const [error, setError] = useState(null);
   // T030: inline validation errors
   const [validationErrors, setValidationErrors] = useState({});
+  // Restored from demo session after sign-in
+  const [restoredFromDemo, setRestoredFromDemo] = useState(false);
+  const formRef = useRef(null);
+
+  // Demo mode state (FR-007, FR-008, FR-009)
+  const [demoResult, setDemoResult] = useState(null);
+  const [demoError, setDemoError] = useState(null);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
+  const [demoDemoJD, setDemoDemoJD] = useState('');
+  const [demoDemoJDError, setDemoDemoJDError] = useState(null);
+  const [demoSkills, setDemoSkills] = useState('');
+
+  // On mount: if user just signed in and had a pending demo JD, restore it
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    try {
+      const raw = sessionStorage.getItem(DEMO_STORAGE_KEY);
+      if (!raw) return;
+      const { jd, skills: savedSkills } = JSON.parse(raw);
+      sessionStorage.removeItem(DEMO_STORAGE_KEY);
+      if (jd) {
+        setJobDescription(jd);
+        if (savedSkills) setSkills(savedSkills);
+        setRestoredFromDemo(true);
+        setTimeout(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+      }
+    } catch {
+      sessionStorage.removeItem(DEMO_STORAGE_KEY);
+    }
+  }, [isAuthenticated]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -117,6 +150,213 @@ export default function SkillGapAnalyzerClient() {
     }
   };
 
+  const handleDemoAnalyze = async () => {
+    if (!demoDemoJD.trim()) {
+      setDemoDemoJDError('Please paste a job description.');
+      return;
+    }
+    if (demoDemoJD.trim().length < JD_MIN_LENGTH) {
+      setDemoDemoJDError(`Job description is too short (${demoDemoJD.trim().length}/${JD_MIN_LENGTH} characters). Please paste the full job posting.`);
+      return;
+    }
+    setDemoDemoJDError(null);
+    setIsDemoLoading(true);
+    setDemoError(null);
+    setDemoResult(null);
+    try {
+      const formData = new FormData();
+      formData.append('jobDescription', demoDemoJD.trim());
+      if (demoSkills.trim()) {
+        formData.append('resumeText', `Skills: ${demoSkills.trim()}`);
+      }
+      const response = await fetch('/api/skillgap-demo', { method: 'POST', body: formData });
+      const data = await response.json();
+      if (response.status === 429) {
+        setDemoError(data.error || 'Demo limit reached. Create a free account for unlimited access.');
+      } else if (!response.ok) {
+        setDemoError(data.error || 'Analysis failed. Please try again.');
+      } else {
+        setDemoResult(data.teaser);
+      }
+    } catch {
+      setDemoError('Network error. Please check your connection and try again.');
+    } finally {
+      setIsDemoLoading(false);
+    }
+  };
+
+  // Demo mode UI for unauthenticated users
+  if (!isAuthenticated) {
+    return (
+      <main className="min-h-screen font-sans" style={{ backgroundColor: "#171717" }}>
+        {/* Hero */}
+        <section className="px-6 py-20 md:py-28 text-center max-w-5xl mx-auto">
+          <h1
+            className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-balance"
+            style={{ background: "linear-gradient(135deg, #1e3a8a 0%, #60a5fa 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}
+          >
+            Skill Gap Analyzer
+          </h1>
+          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed text-pretty">
+            Paste a job description and your skills to instantly see your compatibility score and the top 3 gaps you need to close.
+          </p>
+          <p className="text-white/50 text-sm mt-3">No account needed for the preview. Sign up free to unlock the full report.</p>
+        </section>
+
+        {/* Demo form */}
+        <section className="px-6 pb-16 max-w-4xl mx-auto">
+          <div className="rounded-2xl p-8 md:p-12" style={{ backgroundColor: "#222222" }}>
+            <div className="mb-6">
+              <label className="block text-white font-medium mb-2">
+                Your Skills <span className="text-white/40 font-normal text-sm">(optional)</span>
+              </label>
+              <p className="text-white/60 text-sm mb-3">List your skills for a personalised score — e.g. React, Python, project management</p>
+              <input
+                type="text"
+                value={demoSkills}
+                onChange={(e) => setDemoSkills(e.target.value)}
+                placeholder="e.g. JavaScript, React, teamwork, 2 years experience…"
+                className="w-full px-4 py-3 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                style={{ backgroundColor: "#333333" }}
+              />
+            </div>
+            <label className="block text-white font-medium mb-2">Job Description</label>
+            <p className="text-white/60 text-sm mb-3">Paste any job posting (min 100 characters)</p>
+            <textarea
+              value={demoDemoJD}
+              onChange={(e) => { setDemoDemoJD(e.target.value); setDemoDemoJDError(null); }}
+              placeholder={"Paste the full job description here...\n\nExample:\nWe are looking for a Frontend Developer with experience in React, TypeScript..."}
+              rows={10}
+              className="w-full px-4 py-3 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
+              style={{ backgroundColor: "#333333" }}
+            />
+            <div className="flex justify-between mt-1">
+              {demoDemoJDError
+                ? <p className="text-red-400 text-sm">{demoDemoJDError}</p>
+                : <span />
+              }
+              <p className={`text-sm ml-auto ${demoDemoJD.length < JD_MIN_LENGTH ? 'text-white/30' : 'text-white/50'}`}>
+                {demoDemoJD.length}/{JD_MAX_LENGTH}
+              </p>
+            </div>
+            <div className="mt-6 text-center">
+              <button
+                onClick={handleDemoAnalyze}
+                disabled={isDemoLoading}
+                className="px-10 py-4 text-lg font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                style={{ background: "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)", color: "white" }}
+              >
+                {isDemoLoading ? "Analyzing…" : "See My Score"}
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Demo loading */}
+        {isDemoLoading && (
+          <section className="px-6 pb-16 max-w-4xl mx-auto">
+            <div className="rounded-2xl p-8 bg-white/5 border border-white/10">
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-10 h-10 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+                <p className="text-white/80 text-lg">Analysing job requirements…</p>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Demo error */}
+        {demoError && !isDemoLoading && (
+          <section className="px-6 pb-12 max-w-4xl mx-auto">
+            <div className="rounded-2xl p-6" style={{ backgroundColor: "#3b1a1a" }}>
+              <p className="text-red-400 font-medium">{demoError}</p>
+            </div>
+          </section>
+        )}
+
+        {/* Teaser result + blurred locked section */}
+        {demoResult && !isDemoLoading && (
+          <section className="px-6 pb-24 max-w-4xl mx-auto space-y-6">
+            {/* Teaser */}
+            <div className="rounded-2xl p-8" style={{ backgroundColor: "#222222" }}>
+              <h2 className="text-2xl font-bold mb-6 text-center"
+                style={{ background: "linear-gradient(135deg, #1e3a8a 0%, #60a5fa 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                Your Preview Result
+              </h2>
+              <div className="mb-6 text-center">
+                <p className="text-white/60 text-sm mb-1">Compatibility Score</p>
+                <p className="text-5xl font-bold text-blue-400">{demoResult.compatibilityScore}%</p>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-3">Top 3 Missing Skills</h3>
+                <div className="flex flex-wrap gap-2">
+                  {demoResult.missingSkills.map((skill, i) => (
+                    <span key={i} className="px-3 py-1 rounded-full text-sm"
+                      style={{ backgroundColor: "#4b1c1c", color: "#f87171" }}>
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Blurred locked full report preview (FR-008, FR-009) */}
+            <div className="relative rounded-2xl overflow-hidden">
+              <div className="blur-sm pointer-events-none select-none opacity-60 p-8 rounded-2xl" style={{ backgroundColor: "#222222" }}>
+                <h3 className="text-white font-semibold text-lg mb-4">Full Skill Gap Report</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <p className="text-white/60 font-medium mb-2">All Missing Skills</p>
+                    <div className="flex flex-wrap gap-2">
+                      {['Skill A', 'Skill B', 'Skill C', 'Skill D', 'Skill E'].map((s, i) => (
+                        <span key={i} className="px-3 py-1 rounded-full text-sm" style={{ backgroundColor: "#4b1c1c", color: "#f87171" }}>{s}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-white/60 font-medium mb-2">Matching Skills</p>
+                    <div className="flex flex-wrap gap-2">
+                      {['Match A', 'Match B', 'Match C'].map((s, i) => (
+                        <span key={i} className="px-3 py-1 rounded-full text-sm" style={{ backgroundColor: "#1a3d2b", color: "#4ade80" }}>{s}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-white/60 font-medium mb-2">Suggested Learning Roadmap</p>
+                <ol className="space-y-2">
+                  {['Step 1 placeholder', 'Step 2 placeholder', 'Step 3 placeholder'].map((s, i) => (
+                    <li key={i} className="text-white/80 text-sm flex gap-2">
+                      <span className="text-blue-400 font-medium">{i + 1}.</span>{s}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              {/* Lock overlay */}
+              <div className="absolute inset-0 flex items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(23,23,23,0.7)" }}>
+                <div className="text-center px-6">
+                  <p className="text-white font-semibold text-lg mb-2">Unlock Your Full Report</p>
+                  <p className="text-white/60 text-sm mb-5">Create a free account to see all missing skills, matching skills, learning roadmap, and video tutorials.</p>
+                  <SignUpButton mode="modal">
+                    <button
+                      className="px-8 py-3 rounded-lg font-semibold text-white text-base"
+                      style={{ background: "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)" }}
+                      onClick={() => {
+                        try {
+                          sessionStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify({ jd: demoDemoJD, skills: demoSkills }));
+                        } catch {}
+                      }}
+                    >
+                      Sign up free to unlock full report →
+                    </button>
+                  </SignUpButton>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen font-sans" style={{ backgroundColor: "#171717" }}>
       {/* Hero Section */}
@@ -139,8 +379,19 @@ export default function SkillGapAnalyzerClient() {
         </p>
       </section>
 
+      {/* Restored from demo notice */}
+      {restoredFromDemo && (
+        <section className="px-6 max-w-4xl mx-auto -mt-4 mb-2">
+          <div className="rounded-xl px-5 py-3 flex items-center gap-3 border border-blue-500/30" style={{ backgroundColor: "#1e3a5f33" }}>
+            <span className="text-blue-400 text-lg">✓</span>
+            <p className="text-blue-300 text-sm">Your job description has been restored. Fill in your skills below and click <strong>Analyze Skill Gap</strong> to get your full report.</p>
+            <button onClick={() => setRestoredFromDemo(false)} className="ml-auto text-white/30 hover:text-white/60 text-lg leading-none">×</button>
+          </div>
+        </section>
+      )}
+
       {/* Skills & Experience Input Section */}
-      <section className="px-6 py-16 max-w-4xl mx-auto">
+      <section ref={formRef} className="px-6 py-16 max-w-4xl mx-auto">
         <div className="rounded-2xl p-8 md:p-12" style={{ backgroundColor: "#222222" }}>
           <h2
             className="text-2xl md:text-3xl font-bold mb-4 text-center"

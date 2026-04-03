@@ -1,4 +1,3 @@
-import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/db'
 
@@ -28,7 +27,25 @@ export default async function ReportPage({ params }: ReportPageProps) {
     }
   })
 
-  if (!guidance) notFound()
+  if (!guidance) {
+    return (
+      <div className="min-h-screen pt-24 px-6 pb-16 md:px-10 bg-[#171717]">
+        <div className="max-w-2xl mx-auto text-center space-y-6 pt-16">
+          <div className="text-5xl">📄</div>
+          <h1 className="text-2xl font-bold text-white">This report is no longer available</h1>
+          <p className="text-white/60">
+            The career report you are looking for has been removed or the link has expired.
+          </p>
+          <Link
+            href="/sign-up"
+            className="inline-block px-8 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 shadow-lg shadow-blue-500/25 transition-all duration-300"
+          >
+            Get Your Free Career Report →
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   const skillGap = await prisma.skill_gaps.findFirst({
     where: { clerkId: guidance.clerkId },

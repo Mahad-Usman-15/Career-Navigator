@@ -37,3 +37,28 @@ export async function checkRateLimit(userId: string): Promise<void> {
     )
   }
 }
+
+// Sliding window: 3 demo requests per IP per 60 minutes
+const demoRatelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(3, '60 m'),
+  analytics: false,
+})
+
+/**
+ * IP-based rate limit for the public demo endpoint. 3 requests per hour per IP.
+ * Throws NextResponse 429 on limit exceeded.
+ * Caller must re-throw via: if (error instanceof NextResponse) return error
+ */
+export async function checkDemoRateLimit(ip: string): Promise<void> {
+  const { success, reset } = await demoRatelimit.limit(`demo-ip:${ip}`)
+  if (!success) {
+    throw NextResponse.json(
+      {
+        error: 'Demo limit reached. Create a free account for unlimited access.',
+        resetAt: new Date(reset).toISOString(),
+      },
+      { status: 429 }
+    )
+  }
+}

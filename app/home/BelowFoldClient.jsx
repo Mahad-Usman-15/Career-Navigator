@@ -117,6 +117,51 @@ function VideoPlayer({ title, startTime = 0 }) {
   );
 }
 
+function HowItWorksSection() {
+  const steps = [
+    {
+      number: "01",
+      title: "Take the Assessment",
+      description: "Complete a 10-minute MBTI personality test and IQ assessment to map your unique profile.",
+    },
+    {
+      number: "02",
+      title: "Run Your Skill Gap Scan",
+      description: "Upload your resume or paste your skills. Our AI compares them against any job description.",
+    },
+    {
+      number: "03",
+      title: "Get Your Career Roadmap",
+      description: "Receive personalised career paths, step-by-step roadmaps, and matching job listings — instantly.",
+    },
+  ];
+  return (
+    <section className="py-24 md:py-32 bg-linear-to-b from-transparent via-blue-950/10 to-transparent">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <GradientHeading className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+            How It Works
+          </GradientHeading>
+          <p className="text-white/70 text-lg max-w-2xl mx-auto">
+            Three steps from uncertainty to a clear, personalised career plan.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {steps.map((step) => (
+            <div key={step.number} className="relative p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-blue-500/30 transition-colors duration-300">
+              <div className="text-5xl font-bold bg-linear-to-r from-blue-400/30 to-cyan-400/30 bg-clip-text text-transparent mb-4">
+                {step.number}
+              </div>
+              <h3 className="text-white font-semibold text-xl mb-3">{step.title}</h3>
+              <p className="text-white/60 leading-relaxed">{step.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function CareerGuidanceSection() {
   return (
     <section id="demo" className="py-24 md:py-32">
@@ -140,7 +185,7 @@ function CareerGuidanceSection() {
             <ul className="space-y-4 mb-8">
               {[
                 "Personalized career roadmaps based on your MBTI + IQ profile",
-                "3–5 career paths with match scores and market outlook",
+                "3–5 career paths with match scores and job listings matched to your top path",
                 "Step-by-step timelines with certifications and resources",
               ].map((item, index) => (
                 <li key={index} className="flex items-start gap-3">
@@ -153,7 +198,12 @@ function CareerGuidanceSection() {
                 </li>
               ))}
             </ul>
-            <Link href="/careercounselling"><Button variant="primary">Start Your Assessment</Button></Link>
+            <div className="flex flex-col sm:flex-row items-start gap-4">
+              <Link href="/careercounselling"><Button variant="primary">Start Your Assessment</Button></Link>
+              <Link href="/sample-report" className="text-blue-400 hover:text-blue-300 transition-colors text-sm self-center">
+                See a sample report →
+              </Link>
+            </div>
           </div>
           <div className="order-1 lg:order-2">
             <VideoPlayer title="See Career Navigator in action" startTime={0} />
@@ -184,7 +234,7 @@ function SkillGapSection() {
             </GradientHeading>
             <p className="text-white/70 text-lg leading-relaxed mb-8">
               Our AI compares your resume against any job description to surface exactly what skills
-              are missing. Get a personalized learning roadmap to close the gap and land the job.
+              are missing. Get a personalized learning roadmap with video tutorials and course recommendations to close the gap and land the job.
             </p>
             <div className="grid grid-cols-2 gap-4 mb-8">
               {[
@@ -207,10 +257,52 @@ function SkillGapSection() {
   );
 }
 
-function ImpactSection() {
+function TestimonialsSection() {
+  const testimonials = [
+    {
+      quote: "I had no idea which direction to go after A-levels. Career Navigator showed me exactly why UX Design matches my personality and what skills I need to get there.",
+      name: "Aisha Raza",
+      university: "LUMS, Lahore",
+    },
+    {
+      quote: "The skill gap report told me in 30 seconds what I was missing for a data analyst role. I followed the roadmap and got my first internship offer within two months.",
+      name: "Hamza Tariq",
+      university: "FAST-NUCES, Karachi",
+    },
+    {
+      quote: "Every career counsellor I visited gave generic advice. Career Navigator gave me a specific roadmap with actual resources. It's the first tool that felt built for Pakistani students.",
+      name: "Zara Siddiqui",
+      university: "IBA Karachi",
+    },
+  ];
+  return (
+    <section className="py-24 md:py-32">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <GradientHeading className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+            What Students Are Saying
+          </GradientHeading>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {testimonials.map((t, i) => (
+            <div key={i} className="p-8 rounded-2xl bg-white/5 border border-white/10 flex flex-col gap-6">
+              <p className="text-white/80 leading-relaxed italic">&ldquo;{t.quote}&rdquo;</p>
+              <div>
+                <p className="text-white font-semibold">{t.name}</p>
+                <p className="text-white/50 text-sm">{t.university}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ImpactSection({ totalAssessments = 0, totalSkillGapScans = 0 }) {
   const stats = [
-    { end: 16, suffix: "", label: "MBTI Personality Types" },
-    { end: 5, suffix: "", label: "Career Paths Per Report" },
+    { end: totalAssessments, suffix: "+", label: "Students Assessed" },
+    { end: totalSkillGapScans, suffix: "+", label: "Skill Gap Scans Run" },
     { end: 100, suffix: "%", label: "Free — No Hidden Fees" },
     { end: 3, suffix: "", label: "Core Tools in One Place" },
     { end: 0, suffix: "", label: "Career Counsellors Needed" },
@@ -267,12 +359,14 @@ function FinalBannerSection() {
   );
 }
 
-export default function BelowFoldClient() {
+export default function BelowFoldClient({ totalAssessments = 0, totalSkillGapScans = 0 }) {
   return (
     <>
+      <HowItWorksSection />
       <CareerGuidanceSection />
       <SkillGapSection />
-      <ImpactSection />
+      <TestimonialsSection />
+      <ImpactSection totalAssessments={totalAssessments} totalSkillGapScans={totalSkillGapScans} />
       <FinalBannerSection />
     </>
   );

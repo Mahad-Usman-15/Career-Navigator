@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth-guard'
 import { prisma } from '@/lib/db'
+import { revalidateTag } from 'next/cache'
 
 // Input guardrail — detects gibberish before saving to DB
 function isGibberish(text: string): boolean {
@@ -214,6 +215,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const record = await prisma.career_assessments.create({
       data: { clerkId: userId, ...assessmentData }
     })
+    revalidateTag(`dashboard-${userId}`, 'max')
 
     return NextResponse.json({
       success: true,

@@ -20,7 +20,7 @@ const Index = () => {
       />
     <div className="min-h-screen" style={{ backgroundColor: '#171717' }}>
       {/* Hero Section */}
-      <header className="relative pt-16 pb-12 md:pt-24 md:pb-16 px-4">
+      <header className="relative pt-16 pb-12 md:pt-24 md:pb-16 px-4 overflow-hidden">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-sm md:text-base font-medium uppercase tracking-[0.3em] text-white/60 mb-4">
             Myers-Briggs Type Indicator
