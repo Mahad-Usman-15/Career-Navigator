@@ -318,9 +318,16 @@ function ImpactSection({ totalAssessments = 0, totalSkillGapScans = 0 }) {
             Everything a student needs to go from uncertainty to a clear career plan.
           </p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-          {stats.map((stat, index) => (
+        <div className="grid grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-6">
+          {stats.slice(0, 3).map((stat, index) => (
             <div key={index} className="bg-linear-to-br from-white/5 to-white/2 rounded-2xl border border-white/10 hover:border-blue-500/30 transition-colors duration-300">
+              <AnimatedCounter end={stat.end} suffix={stat.suffix} label={stat.label} />
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-4 md:gap-6 w-2/3 mx-auto">
+          {stats.slice(3).map((stat, index) => (
+            <div key={index + 3} className="bg-linear-to-br from-white/5 to-white/2 rounded-2xl border border-white/10 hover:border-blue-500/30 transition-colors duration-300">
               <AnimatedCounter end={stat.end} suffix={stat.suffix} label={stat.label} />
             </div>
           ))}
